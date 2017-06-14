@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_DATA_NODE_H
 #define OCTOMAP_OCTREE_DATA_NODE_H
 
@@ -48,124 +49,115 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "octomap_types.h"
 #include "assert.h"
+#include "octomap_types.h"
 #include <bitset>
 
 namespace octomap {
 
-  class AbstractOcTreeNode {
+class AbstractOcTreeNode {};
 
+/**
+ * Basic node in the OcTree that can hold arbitrary data of type T in value.
+ * This is the base class for nodes used in an OcTree. The used implementation
+ * for occupancy mapping is in OcTreeNode.#
+ * \tparam T data to be stored in the node (e.g. a float for probabilities)
+ *
+ */
+template <typename T> class OcTreeDataNode : public AbstractOcTreeNode {
 
-  };
+public:
+  OcTreeDataNode();
+  OcTreeDataNode(T initVal);
+  /// Copy constructor, performs a recursive deep-copy of all children
+  OcTreeDataNode(const OcTreeDataNode &rhs);
+
+  ~OcTreeDataNode();
+
+  /// Equals operator, compares if the stored value is identical
+  bool operator==(const OcTreeDataNode &rhs) const;
+
+  // -- children  ----------------------------------
+
+  /// initialize i-th child, allocate children array if needed
+  bool createChild(unsigned int i);
+
+  /// \return true if the i-th child exists
+  bool childExists(unsigned int i) const;
+
+  /// \return a pointer to the i-th child of the node. The child needs to exist.
+  OcTreeDataNode<T> *getChild(unsigned int i);
+
+  /// \return a const pointer to the i-th child of the node. The child needs to
+  /// exist.
+  const OcTreeDataNode<T> *getChild(unsigned int i) const;
+
+  /// \return true if the node has at least one child
+  bool hasChildren() const;
+
+  /// A node is collapsible if all children exist, don't have children of their
+  /// own
+  /// and have the same occupancy value
+  bool collapsible() const;
+
+  /// Deletes the i-th child of the node
+  void deleteChild(unsigned int i);
+
+  // -- pruning of children  -----------------------
 
   /**
-   * Basic node in the OcTree that can hold arbitrary data of type T in value.
-   * This is the base class for nodes used in an OcTree. The used implementation
-   * for occupancy mapping is in OcTreeNode.#
-   * \tparam T data to be stored in the node (e.g. a float for probabilities)
+   * Prunes a node when it is collapsible
+   * @return true if pruning was successful
+   */
+  bool pruneNode();
+
+  /**
+   * Expands a node (reverse of pruning): All children are created and
+   * their occupancy probability is set to the node's value.
+   *
+   * You need to verify that this is indeed a pruned node (i.e. not a
+   * leaf at the lowest level)
    *
    */
-  template<typename T> class OcTreeDataNode: public AbstractOcTreeNode {
+  void expandNode();
 
-  public:
+  /// @return value stored in the node
+  T getValue() const { return value; };
+  /// sets value to be stored in the node
+  void setValue(T v) { value = v; };
 
-    OcTreeDataNode();
-    OcTreeDataNode(T initVal);
-    /// Copy constructor, performs a recursive deep-copy of all children
-    OcTreeDataNode(const OcTreeDataNode& rhs);
+  // file IO:
 
-    ~OcTreeDataNode();
+  /**
+   * Read node from binary stream (incl. float value),
+   * recursively continue with all children.
+   *
+   * @param s
+   * @return
+   */
+  std::istream &readValue(std::istream &s);
 
-    /// Equals operator, compares if the stored value is identical
-    bool operator==(const OcTreeDataNode& rhs) const;
+  /**
+   * Write node to binary stream (incl float value),
+   * recursively continue with all children.
+   * This preserves the complete state of the node.
+   *
+   * @param s
+   * @return
+   */
+  std::ostream &writeValue(std::ostream &s) const;
 
+  /// Make the templated data type available from the outside
+  typedef T DataType;
 
-    // -- children  ----------------------------------
+protected:
+  void allocChildren();
 
-
-    /// initialize i-th child, allocate children array if needed
-    bool createChild(unsigned int i);
-
-    /// \return true if the i-th child exists
-    bool childExists(unsigned int i) const;
-
-    /// \return a pointer to the i-th child of the node. The child needs to exist.
-    OcTreeDataNode<T>* getChild(unsigned int i);
-
-    /// \return a const pointer to the i-th child of the node. The child needs to exist.
-    const OcTreeDataNode<T>* getChild(unsigned int i) const;
-
-    /// \return true if the node has at least one child
-    bool hasChildren() const;
-
-    /// A node is collapsible if all children exist, don't have children of their own
-    /// and have the same occupancy value
-    bool collapsible() const;
-
-    /// Deletes the i-th child of the node
-    void deleteChild(unsigned int i);
-
-    // -- pruning of children  -----------------------
-
-
-    /**
-     * Prunes a node when it is collapsible
-     * @return true if pruning was successful
-     */
-    bool pruneNode();
-
-    /**
-     * Expands a node (reverse of pruning): All children are created and
-     * their occupancy probability is set to the node's value.
-     *
-     * You need to verify that this is indeed a pruned node (i.e. not a
-     * leaf at the lowest level)
-     *
-     */
-    void expandNode();
-
-    /// @return value stored in the node
-    T getValue() const{return value;};
-    /// sets value to be stored in the node
-    void setValue(T v) {value = v;};
-
-    // file IO:
-
-    /**
-     * Read node from binary stream (incl. float value),
-     * recursively continue with all children.
-     *
-     * @param s
-     * @return
-     */
-    std::istream& readValue(std::istream &s);
-
-    /**
-     * Write node to binary stream (incl float value),
-     * recursively continue with all children.
-     * This preserves the complete state of the node.
-     *
-     * @param s
-     * @return
-     */
-    std::ostream& writeValue(std::ostream &s) const;
-
-
-    /// Make the templated data type available from the outside
-    typedef T DataType;
-
-
-  protected:
-    void allocChildren();
-
-    /// pointer to array of children, may be NULL
-    OcTreeDataNode<T>** children;
-    /// stored data (payload)
-    T value;
-
-  };
-
+  /// pointer to array of children, may be NULL
+  OcTreeDataNode<T> **children;
+  /// stored data (payload)
+  T value;
+};
 
 } // end namespace
 

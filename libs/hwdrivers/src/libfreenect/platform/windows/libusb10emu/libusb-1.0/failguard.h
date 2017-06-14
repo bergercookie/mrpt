@@ -1,13 +1,11 @@
 #pragma once
 
-namespace libusbemu
-{
-  namespace failguard
-  {
-    const bool Check();
+namespace libusbemu {
+namespace failguard {
+const bool Check();
 
-    void WaitDecision();
+void WaitDecision();
 
-    const bool Abort();
-  }
+const bool Abort();
+}
 }

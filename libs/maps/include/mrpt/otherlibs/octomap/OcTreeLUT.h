@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_LUT_H
 #define OCTOMAP_OCTREE_LUT_H
 
@@ -13,14 +14,17 @@
 
 /**
  * OctoMap:
- * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
- * @author Raphael Schmitt, K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2010.
+ * A probabilistic, flexible, and compact 3D mapping library for robotic
+ * systems.
+ * @author Raphael Schmitt, K. M. Wurm, A. Hornung, University of Freiburg,
+ * Copyright (C) 2010.
  * @see http://octomap.sourceforge.net/
  * License: New BSD License
  */
 
 /*
- * Copyright (c) 2010, Raphael Schmitt, K. M. Wurm, A. Hornung, University of Freiburg
+ * Copyright (c) 2010, Raphael Schmitt, K. M. Wurm, A. Hornung, University of
+ * Freiburg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,73 +52,92 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include "OcTreeKey.h"
 #include "OcTreeLUTdefs.h"
 #include "octomap_types.h"
-#include "OcTreeKey.h"
 
 namespace octomap {
 
+//! comparator for keys
+struct equal_keys {
+  bool operator()(const unsigned short int *key1,
+                  const unsigned short int *key2) const {
+    return ((key1[0] == key2[0]) && (key1[1] == key2[1]) &&
+            (key1[2] == key2[2]));
+  }
+};
 
-  //! comparator for keys
-  struct equal_keys {
-    bool operator() (const unsigned short int* key1, const unsigned short int* key2) const {
-      return ((key1[0]==key2[0]) && (key1[1] == key2[1]) && (key1[2] == key2[2]));
-    }
-  };
+struct hash_key {
+  unsigned short int operator()(const unsigned short int *key) const {
+    return (((31 + key[0]) * 31 + key[1]) * 31 + key[2]);
+  }
+};
 
-  struct hash_key {
-    unsigned short int operator()(const unsigned short int* key) const {
-      return (((31 + key[0]) * 31 + key[1]) * 31 + key[2]);
-    }
-  };
+/**
+ *   Implements a lookup table that allows to computer keys of neighbor cells
+ * directly,
+ *   see: Samet 1989, "Implementing ray tracing with octrees and neighbor
+ * finding"
+ */
+class OcTreeLUT {
 
-
-  
+public:
   /**
-   *   Implements a lookup table that allows to computer keys of neighbor cells directly, 
-   *   see: Samet 1989, "Implementing ray tracing with octrees and neighbor finding"
+   *  (N)orth: positive X   (S)outh:  negative X
+   *  (W)est : positive Y   (E)ast:   negative Y
+   *  (T)op  : positive Z   (B)ottom: negative Z
    */
-  class OcTreeLUT {
 
-  public:
+  typedef enum {
+    W = 0,
+    E,
+    N,
+    S,
+    T,
+    B, // face neighbors
+    SW,
+    NW,
+    SE,
+    NE,
+    TW,
+    BW,
+    TE,
+    BE,
+    TN,
+    TS,
+    BN,
+    BS, // edge neighbors
+    TNW,
+    TSW,
+    TNE,
+    TSE,
+    BNW,
+    BSW,
+    BNE,
+    BSE // vertex neighbors
+  } NeighborDirection;
 
-    /**
-     *  (N)orth: positive X   (S)outh:  negative X
-     *  (W)est : positive Y   (E)ast:   negative Y
-     *  (T)op  : positive Z   (B)ottom: negative Z
-     */
+public:
+  OcTreeLUT(unsigned int _max_depth);
+  ~OcTreeLUT();
 
-    typedef enum {
-      W = 0, E, N, S , T , B,                         // face neighbors
-      SW, NW, SE, NE, TW, BW, TE, BE, TN, TS, BN, BS, // edge neighbors
-      TNW, TSW, TNE, TSE, BNW, BSW, BNE, BSE          // vertex neighbors
-    } NeighborDirection;
+  bool genNeighborKey(const OcTreeKey &node_key, const signed char &dir,
+                      OcTreeKey &neighbor_key) const;
 
+protected:
+  void initLUT();
 
-  public:
+  unsigned int genPos(const OcTreeKey &key, const int &i) const;
+  void changeKey(const int &val, OcTreeKey &key,
+                 const unsigned short int &i) const;
 
-    OcTreeLUT(unsigned int _max_depth);
-    ~OcTreeLUT();
-    
-    bool genNeighborKey(const OcTreeKey& node_key, const signed char& dir,
-                        OcTreeKey& neighbor_key) const;
+protected:
+  unsigned int max_depth;
 
-  protected:
-
-    void initLUT();
-
-    unsigned int genPos(const OcTreeKey& key, const int& i) const;
-    void changeKey(const int& val, OcTreeKey& key, const unsigned short int& i) const;
-
-  protected:
-
-    unsigned int max_depth;
-
-    signed char nf_values[8][26];
-    signed char nf_rec_values[8][26];
-    signed char nf_multiple_values[26][4];
-  }; 
+  signed char nf_values[8][26];
+  signed char nf_rec_values[8][26];
+  signed char nf_multiple_values[26][4];
+};
 
 } // namespace
 

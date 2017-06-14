@@ -5,13 +5,14 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
-#include <mrpt/utils/CConfigFile.h>
 #include <mrpt/hwdrivers/CSerialPort.h>
 #include <mrpt/hwdrivers/CSickLaserUSB.h>
 #include <mrpt/maps/CSimplePointsMap.h>
 #include <mrpt/system/os.h>
+#include <mrpt/utils/CConfigFile.h>
 
 using namespace mrpt;
 using namespace mrpt::utils;
@@ -25,89 +26,75 @@ using namespace std;
 // ------------------------------------------------------
 //				Test_PLS
 // ------------------------------------------------------
-void TestPLS()
-{
-	CSickLaserUSB	laser;
+void TestPLS() {
+  CSickLaserUSB laser;
 
-	// Load config:
-	laser.loadConfig( CConfigFile( "./LASER_SCAN_TEST.ini") ,"PLS#1" );
+  // Load config:
+  laser.loadConfig(CConfigFile("./LASER_SCAN_TEST.ini"), "PLS#1");
 
-	laser.setDeviceSerialNumber("LASER003");
+  laser.setDeviceSerialNumber("LASER003");
 
-	printf("[TEST] Turning laser ON...\n");
-	if (laser.turnOn())
-		printf("[TEST] Initialization OK!\n");
-	else
-	{
-		printf("[TEST] Initialization failed!\n");
-		return;
-	}
+  printf("[TEST] Turning laser ON...\n");
+  if (laser.turnOn())
+    printf("[TEST] Initialization OK!\n");
+  else {
+    printf("[TEST] Initialization failed!\n");
+    return;
+  }
 
-	while (!mrpt::system::os::kbhit())
-	{
-		bool						thereIsObservation,hardError;
-		CObservation2DRangeScan		obs;
+  while (!mrpt::system::os::kbhit()) {
+    bool thereIsObservation, hardError;
+    CObservation2DRangeScan obs;
 
-		try
-		{
-			laser.doProcessSimple( thereIsObservation, obs, hardError );
-		}
-		catch (std::exception &e)
-		{
-			cerr << e.what() << endl;
-			hardError = true;
-		}
+    try {
+      laser.doProcessSimple(thereIsObservation, obs, hardError);
+    } catch (std::exception &e) {
+      cerr << e.what() << endl;
+      hardError = true;
+    }
 
-		if (hardError)
-			printf("[TEST] Hardware error=true!!\n");
+    if (hardError)
+      printf("[TEST] Hardware error=true!!\n");
 
-		if (thereIsObservation)
-		{
-			printf("[TEST] Observation received (%u ranges over %.02fdeg, mid=%.03f)!!\n",
-				(unsigned int)obs.scan.size(),
-				RAD2DEG(obs.aperture),
-				obs.scan[obs.scan.size()/2]);
+    if (thereIsObservation) {
+      printf("[TEST] Observation received (%u ranges over %.02fdeg, "
+             "mid=%.03f)!!\n",
+             (unsigned int)obs.scan.size(), RAD2DEG(obs.aperture),
+             obs.scan[obs.scan.size() / 2]);
 
-			obs.sensorPose = CPose3D(0,0,0);
+      obs.sensorPose = CPose3D(0, 0, 0);
 
-			mrpt::maps::CSimplePointsMap		map;
-			map.insertionOptions.minDistBetweenLaserPoints	= 0;
-			map.insertObservation( &obs );
-			map.save2D_to_text_file("_out_scan.txt");
+      mrpt::maps::CSimplePointsMap map;
+      map.insertionOptions.minDistBetweenLaserPoints = 0;
+      map.insertObservation(&obs);
+      map.save2D_to_text_file("_out_scan.txt");
 
-/*			COpenGLScene			scene3D;
-			opengl::CPointCloud::Ptr points = std::make_shared<opengl::CPointCloud>();
-			points->loadFromPointsMap(&map);
-			scene3D.insert(points);
-			CFileOutputStream("_out_point_cloud.3Dscene") << scene3D;
-*/
-		}
+      /*			COpenGLScene			scene3D;
+                              opengl::CPointCloud::Ptr points =
+         std::make_shared<opengl::CPointCloud>();
+                              points->loadFromPointsMap(&map);
+                              scene3D.insert(points);
+                              CFileOutputStream("_out_point_cloud.3Dscene") <<
+         scene3D;
+      */
+    }
 
-		std::this_thread::sleep_for(10ms);
-	};
+    std::this_thread::sleep_for(10ms);
+  };
 
-
-	laser.turnOff();
-
+  laser.turnOff();
 }
 
-int main()
-{
-	try
-	{
-		TestPLS();
-		return 0;
+int main() {
+  try {
+    TestPLS();
+    return 0;
 
-	} catch (std::exception &e)
-	{
-		std::cout << "EXCEPCION: " << e.what() << std::endl;
-		return -1;
-	}
-	catch (...)
-	{
-		printf("Another exception!!");
-		return -1;
-	}
-
+  } catch (std::exception &e) {
+    std::cout << "EXCEPCION: " << e.what() << std::endl;
+    return -1;
+  } catch (...) {
+    printf("Another exception!!");
+    return -1;
+  }
 }
-

@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 /*
   App      : kinect-calibrate
@@ -19,10 +20,9 @@
 
 #include <wx/app.h>
 
-class kinect_calibrate_guiApp : public wxApp
-{
-    public:
-        virtual bool OnInit();
+class kinect_calibrate_guiApp : public wxApp {
+public:
+  virtual bool OnInit();
 };
 
 #endif // KINECT_CALIBRATE_GUIAPP_H

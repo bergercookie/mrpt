@@ -5,13 +5,14 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 // TODO: convert defines to ENUMs
 
 // Lookup table for neighbor search
 
-  //front
+// front
 #define LUT_N 0
 #define LUT_S 1
 #define LUT_E 2
@@ -19,7 +20,7 @@
 #define LUT_F 4
 #define LUT_R 5
 
-  //edge
+// edge
 #define LUT_NW 6
 #define LUT_NE 7
 #define LUT_SW 8
@@ -33,7 +34,7 @@
 #define LUT_RE 16
 #define LUT_RW 17
 
-  //vertex
+// vertex
 #define LUT_FNE 18
 #define LUT_FNW 19
 #define LUT_FSE 20
@@ -43,7 +44,7 @@
 #define LUT_RSE 24
 #define LUT_RSW 25
 
-  //edge rec.-values
+// edge rec.-values
 #define LUT_NW_TO_W 3
 #define LUT_NW_TO_N 6
 #define LUT_NE_TO_E 5
@@ -69,7 +70,7 @@
 #define LUT_RW_TO_R 12
 #define LUT_RW_TO_W 14
 
-  //vertex rec.values
+// vertex rec.values
 #define LUT_FNE_TO_E 16
 #define LUT_FNE_TO_N 18
 #define LUT_FNE_TO_NE 11
@@ -129,5 +130,4 @@
 #define LUT_SELF 0
 
 #define LUT_NO_REC 127
-  //#define LUT_ 0
-
+//#define LUT_ 0

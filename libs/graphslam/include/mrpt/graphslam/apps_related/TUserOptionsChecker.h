@@ -5,43 +5,44 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef TUSEROPTIONSCHECKER_H
 #define TUSEROPTIONSCHECKER_H
 
+#include <mrpt/graphs/CNetworkOfPoses.h>
+#include <mrpt/poses/CPose3DPDFGaussianInf.h>
+#include <mrpt/poses/CPosePDFGaussianInf.h>
 #include <mrpt/system/filesystem.h>
 #include <mrpt/utils/mrpt_macros.h>
-#include <mrpt/graphs/CNetworkOfPoses.h>
-#include <mrpt/poses/CPosePDFGaussianInf.h>
-#include <mrpt/poses/CPose3DPDFGaussianInf.h>
 
-#include <mrpt/graphslam/link_pragmas.h>
-#include <mrpt/graphslam/NRD/CFixedIntervalsNRD.h>
-#include <mrpt/graphslam/NRD/CEmptyNRD.h>
-#include <mrpt/graphslam/NRD/CICPCriteriaNRD.h>
-#include <mrpt/graphslam/ERD/CICPCriteriaERD.h>
 #include <mrpt/graphslam/ERD/CEmptyERD.h>
+#include <mrpt/graphslam/ERD/CICPCriteriaERD.h>
 #include <mrpt/graphslam/ERD/CLoopCloserERD.h>
 #include <mrpt/graphslam/GSO/CLevMarqGSO.h>
+#include <mrpt/graphslam/NRD/CEmptyNRD.h>
+#include <mrpt/graphslam/NRD/CFixedIntervalsNRD.h>
+#include <mrpt/graphslam/NRD/CICPCriteriaNRD.h>
+#include <mrpt/graphslam/link_pragmas.h>
 
-#include <string>
 #include <iostream>
+#include <string>
 #include <vector>
 
-namespace mrpt { namespace graphslam { namespace apps {
+namespace mrpt {
+namespace graphslam {
+namespace apps {
 
 /**\brief Properties struct for both the Registration Decider and Optimizer
-	* classes
-	*/
+        * classes
+        */
 struct GRAPHSLAM_IMPEXP TRegistrationDeciderOrOptimizerProps {
-	TRegistrationDeciderOrOptimizerProps():
-		name(""),
-		description(""),
-		is_mr_slam_class(false),
-		is_slam_2d(true), // by default the decider/optimizer is considered 2D
-		is_slam_3d(false) {}
-	~TRegistrationDeciderOrOptimizerProps() {}
+  TRegistrationDeciderOrOptimizerProps()
+      : name(""), description(""), is_mr_slam_class(false),
+        is_slam_2d(true), // by default the decider/optimizer is considered 2D
+        is_slam_3d(false) {}
+  ~TRegistrationDeciderOrOptimizerProps() {}
 
   /**\brief Name of the decider or optimizer class
    */
@@ -54,20 +55,16 @@ struct GRAPHSLAM_IMPEXP TRegistrationDeciderOrOptimizerProps {
   bool is_mr_slam_class;
   bool is_slam_2d;
   bool is_slam_3d;
-
 };
 
 /**\brief Properties struct for the Registration Decider classes.
  *
  * \ingroup mrpt_graphslam_grp
  */
-struct GRAPHSLAM_IMPEXP TRegistrationDeciderProps :
-	public TRegistrationDeciderOrOptimizerProps
-{
-	TRegistrationDeciderProps():
-		type(""),
-		rawlog_format("") {}
-	~TRegistrationDeciderProps() {}
+struct GRAPHSLAM_IMPEXP TRegistrationDeciderProps
+    : public TRegistrationDeciderOrOptimizerProps {
+  TRegistrationDeciderProps() : type(""), rawlog_format("") {}
+  ~TRegistrationDeciderProps() {}
 
   /**\brief Type of decider.
    *
@@ -76,7 +73,7 @@ struct GRAPHSLAM_IMPEXP TRegistrationDeciderProps :
    * - edge
    */
   std::string type;
- 	/**\brief Rawlog formats that the decider can be used in */
+  /**\brief Rawlog formats that the decider can be used in */
   std::string rawlog_format;
   /**\brief Measurements that the current decider class can utilize */
   std::vector<std::string> observations_used;
@@ -86,13 +83,11 @@ struct GRAPHSLAM_IMPEXP TRegistrationDeciderProps :
  *
  * \ingroup mrpt_graphslam_grp
  */
-struct GRAPHSLAM_IMPEXP TOptimizerProps :
-	public TRegistrationDeciderOrOptimizerProps
-{
-	TOptimizerProps() {}
-	~TOptimizerProps() {}
+struct GRAPHSLAM_IMPEXP TOptimizerProps
+    : public TRegistrationDeciderOrOptimizerProps {
+  TOptimizerProps() {}
+  ~TOptimizerProps() {}
 };
-
 
 /**\brief Class containing the declarations of supplementary methods that can
  * be used in application-related code.
@@ -102,124 +97,124 @@ struct GRAPHSLAM_IMPEXP TOptimizerProps :
  *
  * \ingroup mrpt_graphslam_grp
  */
-template<class GRAPH_t>
-struct TUserOptionsChecker {
-	/**\name handy typedefs for the creation of deciders/optimzer instances from
-	 * the corresponding strings
-	 */
-	/**\{*/
-	typedef typename GRAPH_t::constraint_t constraint_t;
-		typedef typename GRAPH_t::constraint_t::type_value pose_t;
-	typedef std::map<
-		std::string,
-		mrpt::graphslam::deciders::CNodeRegistrationDecider<GRAPH_t>*(*)()> node_regs_t;
-	typedef std::map<
-		std::string,
-		mrpt::graphslam::deciders::CEdgeRegistrationDecider<GRAPH_t>*(*)()> edge_regs_t;
-	typedef std::map<
-		std::string,
-		mrpt::graphslam::optimizers::CGraphSlamOptimizer<GRAPH_t>*(*)()> optimizers_t;
+template <class GRAPH_t> struct TUserOptionsChecker {
+  /**\name handy typedefs for the creation of deciders/optimzer instances from
+   * the corresponding strings
+   */
+  /**\{*/
+  typedef typename GRAPH_t::constraint_t constraint_t;
+  typedef typename GRAPH_t::constraint_t::type_value pose_t;
+  typedef std::map<
+      std::string,
+      mrpt::graphslam::deciders::CNodeRegistrationDecider<GRAPH_t> *(*)()>
+      node_regs_t;
+  typedef std::map<
+      std::string,
+      mrpt::graphslam::deciders::CEdgeRegistrationDecider<GRAPH_t> *(*)()>
+      edge_regs_t;
+  typedef std::map<
+      std::string,
+      mrpt::graphslam::optimizers::CGraphSlamOptimizer<GRAPH_t> *(*)()>
+      optimizers_t;
 
-	/**\}*/
+  /**\}*/
 
-	//
-	// methods
-	//
-	/**\brief Constructor */
-	TUserOptionsChecker();
-	/**\brief Destructor */
-	virtual ~TUserOptionsChecker();
-	/**\brief Create the necessary mappings from strings to the corresponding
-	 * instance creation functors.
-	 *
-	 * Method is used for populating a map from string to instance creation
-	 * function. The decider/optimzer can then be spawned according to the user
-	 * selection.
-	 *
-	 */
-	virtual void createDeciderOptimizerMappings();
-	virtual void _createDeciderOptimizerMappings();
-	/**\brief Populate the available decider, optimizer classes available in
-	 * user applications
-	 */
-	virtual void populateDeciderOptimizerProperties();
-	/**\brief Check if the given registrator decider exists in the vector of
- 	 * deciders.
- 	 * \param[in] given_reg String specifying the type of decider - This should
- 	 * either be "node" or "edge"
- 	 * \return True if it exists, false otherwise
- 	 */
-	virtual bool checkRegistrationDeciderExists(
-			std::string given_reg,
-			std::string reg_type) const;
+  //
+  // methods
+  //
+  /**\brief Constructor */
+  TUserOptionsChecker();
+  /**\brief Destructor */
+  virtual ~TUserOptionsChecker();
+  /**\brief Create the necessary mappings from strings to the corresponding
+   * instance creation functors.
+   *
+   * Method is used for populating a map from string to instance creation
+   * function. The decider/optimzer can then be spawned according to the user
+   * selection.
+   *
+   */
+  virtual void createDeciderOptimizerMappings();
+  virtual void _createDeciderOptimizerMappings();
+  /**\brief Populate the available decider, optimizer classes available in
+   * user applications
+   */
+  virtual void populateDeciderOptimizerProperties();
+  /**\brief Check if the given registrator decider exists in the vector of
+   * deciders.
+   * \param[in] given_reg String specifying the type of decider - This should
+   * either be "node" or "edge"
+   * \return True if it exists, false otherwise
+   */
+  virtual bool checkRegistrationDeciderExists(std::string given_reg,
+                                              std::string reg_type) const;
 
-	/**\brief Check if the given optimizer exists in the vector of optimizers.
- 	 * \return True if it exists, false otherwise
- 	 */
-	virtual bool checkOptimizerExists(
-			std::string given_opt) const;
+  /**\brief Check if the given optimizer exists in the vector of optimizers.
+   * \return True if it exists, false otherwise
+   */
+  virtual bool checkOptimizerExists(std::string given_opt) const;
 
-	/**\brief Print the registration deciders vector in a formatted manner to the
- 	 * standard output
- 	 * \param[in] reg_type Method prints both the node registration
- 	 * and edge registration deciders of the given vector unless specified
- 	 * otherwise. The available argument options are "node", "edge", "all"
- 	 */
-	virtual void dumpRegistrarsToConsole(std::string reg_type="all") const;
-	/**\brief Print the optimizers vector in a formatted manner to the standard
- 	 * output.
- 	 */
-	virtual void dumpOptimizersToConsole() const;
+  /**\brief Print the registration deciders vector in a formatted manner to the
+   * standard output
+   * \param[in] reg_type Method prints both the node registration
+   * and edge registration deciders of the given vector unless specified
+   * otherwise. The available argument options are "node", "edge", "all"
+   */
+  virtual void dumpRegistrarsToConsole(std::string reg_type = "all") const;
+  /**\brief Print the optimizers vector in a formatted manner to the standard
+   * output.
+   */
+  virtual void dumpOptimizersToConsole() const;
 
-	/**\name Methods for initializing decider/optimizer instances based on the user
- 	 * command line choices - http://stackoverflow.com/a/582456/2843583
- 	 *
- 	 * \warning Caller is responsible for deleting the initialized instances
- 	 */
-	/**\{*/
-	template<class T>
-	static mrpt::graphslam::deciders::CNodeRegistrationDecider<GRAPH_t>*
-	createNodeRegistrationDecider() {
-		return new T;
-	}
-	template<class T>
-	static mrpt::graphslam::deciders::CEdgeRegistrationDecider<GRAPH_t>*
-	createEdgeRegistrationDecider() {
-		return new T;
-	}
-	template<class T>
-	static mrpt::graphslam::optimizers::CGraphSlamOptimizer<GRAPH_t>*
-	createGraphSlamOptimizer() {
-		return new T;
-	}
-	/**}*/
+  /**\name Methods for initializing decider/optimizer instances based on the
+   * user
+   * command line choices - http://stackoverflow.com/a/582456/2843583
+   *
+   * \warning Caller is responsible for deleting the initialized instances
+   */
+  /**\{*/
+  template <class T>
+  static mrpt::graphslam::deciders::CNodeRegistrationDecider<GRAPH_t> *
+  createNodeRegistrationDecider() {
+    return new T;
+  }
+  template <class T>
+  static mrpt::graphslam::deciders::CEdgeRegistrationDecider<GRAPH_t> *
+  createEdgeRegistrationDecider() {
+    return new T;
+  }
+  template <class T>
+  static mrpt::graphslam::optimizers::CGraphSlamOptimizer<GRAPH_t> *
+  createGraphSlamOptimizer() {
+    return new T;
+  }
+  /**}*/
 
-	/**\name Mappings from registration decider/optimizer names to functors
-	 * for creating instances of the corresponding classes
-	 */
-	/**\{*/
-	node_regs_t node_regs_map;
-	edge_regs_t edge_regs_map;
-	optimizers_t optimizers_map;
-	/**\}*/
+  /**\name Mappings from registration decider/optimizer names to functors
+   * for creating instances of the corresponding classes
+   */
+  /**\{*/
+  node_regs_t node_regs_map;
+  edge_regs_t edge_regs_map;
+  optimizers_t optimizers_map;
+  /**\}*/
 
-	/**\name Vectors containing descriptions about the available
-	 * deciders/optimizers.
-	 *
-	 * Handy for displaying information to the user (e.g. in help text)
-	 */
-	/**\{*/
-	std::vector<TRegistrationDeciderProps*> regs_descriptions;
-	std::vector<TOptimizerProps*> optimizers_descriptions;
-	/**\}*/
+  /**\name Vectors containing descriptions about the available
+   * deciders/optimizers.
+   *
+   * Handy for displaying information to the user (e.g. in help text)
+   */
+  /**\{*/
+  std::vector<TRegistrationDeciderProps *> regs_descriptions;
+  std::vector<TOptimizerProps *> optimizers_descriptions;
+  /**\}*/
 
-	const std::string sep_header;
-	const std::string sep_subheader;
-
+  const std::string sep_header;
+  const std::string sep_subheader;
 };
-
-
-} } } // END OF NAMESPACES
+}
+}
+} // END OF NAMESPACES
 #include "TUserOptionsChecker_impl.h"
 
 #endif /* end of include guard: TUSEROPTIONSCHECKER_H */

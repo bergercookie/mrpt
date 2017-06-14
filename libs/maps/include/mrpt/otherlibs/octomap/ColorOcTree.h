@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_COLOR_OCTREE_H
 #define OCTOMAP_COLOR_OCTREE_H
 
@@ -13,8 +14,10 @@
 
 /**
  * OctoMap:
- * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
- * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011
+ * A probabilistic, flexible, and compact 3D mapping library for robotic
+ * systems.
+ * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+ * 2009-2011
  * @see http://octomap.sourceforge.net/
  * License: New BSD License
  */
@@ -49,159 +52,170 @@
  */
 
 #include <iostream>
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 #include <mrpt/otherlibs/octomap/OcTreeNode.h>
 #include <mrpt/otherlibs/octomap/OccupancyOcTreeBase.h>
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 
 namespace octomap {
-  
-  // node definition
-  class  /*MAPS_IMPEXP*/ ColorOcTreeNode : public OcTreeNode {    
+
+// node definition
+class /*MAPS_IMPEXP*/ ColorOcTreeNode : public OcTreeNode {
+public:
+  class Color {
   public:
-    
-    class Color {
-    public:
     Color() : r(255), g(255), b(255) {}
-    Color(unsigned char _r, unsigned char _g, unsigned char _b) 
-      : r(_r), g(_g), b(_b) {}
-      inline bool operator== (const Color &other) const {
-        return (r==other.r && g==other.g && b==other.b);
-      }
-      inline bool operator!= (const Color &other) const {
-        return (r!=other.r || g!=other.g || b!=other.b);
-      }
-      unsigned char r, g, b;
-    };
-
-  public:
-    ColorOcTreeNode() : OcTreeNode() {}
-
-    ColorOcTreeNode(const ColorOcTreeNode& rhs) : OcTreeNode(rhs), color(rhs.color) {}
-
-    bool operator==(const ColorOcTreeNode& rhs) const{
-      return (rhs.value == value && rhs.color == color);
+    Color(unsigned char _r, unsigned char _g, unsigned char _b)
+        : r(_r), g(_g), b(_b) {}
+    inline bool operator==(const Color &other) const {
+      return (r == other.r && g == other.g && b == other.b);
     }
-    
-    // children
-    inline ColorOcTreeNode* getChild(unsigned int i) {
-      return static_cast<ColorOcTreeNode*> (OcTreeNode::getChild(i));
+    inline bool operator!=(const Color &other) const {
+      return (r != other.r || g != other.g || b != other.b);
     }
-    inline const ColorOcTreeNode* getChild(unsigned int i) const {
-      return static_cast<const ColorOcTreeNode*> (OcTreeNode::getChild(i));
-    }
-
-    bool createChild(unsigned int i) {
-      if (children == nullptr) allocChildren();
-      children[i] = new ColorOcTreeNode();
-      return true;
-    }
-
-    bool pruneNode();
-    void expandNode();
-    
-    inline Color getColor() const { return color; }
-    inline void  setColor(Color c) {this->color = c; }
-    inline void  setColor(unsigned char r, unsigned char g, unsigned char b) {
-      this->color = Color(r,g,b); 
-    }
-
-    Color& getColor() { return color; }
-
-    // has any color been integrated? (pure white is very unlikely...)
-    inline bool isColorSet() const { 
-      return ((color.r != 255) || (color.g != 255) || (color.b != 255)); 
-    }
-
-    void updateColorChildren();
-
-
-    ColorOcTreeNode::Color getAverageChildColor() const;
-  
-    // file I/O
-    std::istream& readValue (std::istream &s);
-    std::ostream& writeValue(std::ostream &s) const;
-    
-  protected:
-    Color color;
+    unsigned char r, g, b;
   };
 
+public:
+  ColorOcTreeNode() : OcTreeNode() {}
 
-  // tree definition
-  class /*MAPS_IMPEXP*/ ColorOcTree : public OccupancyOcTreeBase <ColorOcTreeNode> {
+  ColorOcTreeNode(const ColorOcTreeNode &rhs)
+      : OcTreeNode(rhs), color(rhs.color) {}
 
+  bool operator==(const ColorOcTreeNode &rhs) const {
+    return (rhs.value == value && rhs.color == color);
+  }
+
+  // children
+  inline ColorOcTreeNode *getChild(unsigned int i) {
+    return static_cast<ColorOcTreeNode *>(OcTreeNode::getChild(i));
+  }
+  inline const ColorOcTreeNode *getChild(unsigned int i) const {
+    return static_cast<const ColorOcTreeNode *>(OcTreeNode::getChild(i));
+  }
+
+  bool createChild(unsigned int i) {
+    if (children == nullptr)
+      allocChildren();
+    children[i] = new ColorOcTreeNode();
+    return true;
+  }
+
+  bool pruneNode();
+  void expandNode();
+
+  inline Color getColor() const { return color; }
+  inline void setColor(Color c) { this->color = c; }
+  inline void setColor(unsigned char r, unsigned char g, unsigned char b) {
+    this->color = Color(r, g, b);
+  }
+
+  Color &getColor() { return color; }
+
+  // has any color been integrated? (pure white is very unlikely...)
+  inline bool isColorSet() const {
+    return ((color.r != 255) || (color.g != 255) || (color.b != 255));
+  }
+
+  void updateColorChildren();
+
+  ColorOcTreeNode::Color getAverageChildColor() const;
+
+  // file I/O
+  std::istream &readValue(std::istream &s);
+  std::ostream &writeValue(std::ostream &s) const;
+
+protected:
+  Color color;
+};
+
+// tree definition
+class /*MAPS_IMPEXP*/ ColorOcTree
+    : public OccupancyOcTreeBase<ColorOcTreeNode> {
+
+public:
+  /// Default constructor, sets resolution of leafs
+  ColorOcTree(double resolution)
+      : OccupancyOcTreeBase<ColorOcTreeNode>(resolution){};
+
+  /// virtual constructor: creates a new object of same type
+  /// (Covariant return type requires an up-to-date compiler)
+  ColorOcTree *create() const { return new ColorOcTree(resolution); }
+
+  std::string getTreeType() const { return "ColorOcTree"; }
+
+  // set node color at given key or coordinate. Replaces previous color.
+  ColorOcTreeNode *setNodeColor(const OcTreeKey &key, const unsigned char &r,
+                                const unsigned char &g, const unsigned char &b);
+
+  ColorOcTreeNode *setNodeColor(const float &x, const float &y, const float &z,
+                                const unsigned char &r, const unsigned char &g,
+                                const unsigned char &b) {
+    OcTreeKey key;
+    if (!this->coordToKeyChecked(point3d(x, y, z), key))
+      return nullptr;
+    return setNodeColor(key, r, g, b);
+  }
+
+  // integrate color measurement at given key or coordinate. Average with
+  // previous color
+  ColorOcTreeNode *averageNodeColor(const OcTreeKey &key,
+                                    const unsigned char &r,
+                                    const unsigned char &g,
+                                    const unsigned char &b);
+
+  ColorOcTreeNode *averageNodeColor(const float &x, const float &y,
+                                    const float &z, const unsigned char &r,
+                                    const unsigned char &g,
+                                    const unsigned char &b) {
+    OcTreeKey key;
+    if (!this->coordToKeyChecked(point3d(x, y, z), key))
+      return nullptr;
+    return averageNodeColor(key, r, g, b);
+  }
+
+  // integrate color measurement at given key or coordinate. Average with
+  // previous color
+  ColorOcTreeNode *integrateNodeColor(const OcTreeKey &key,
+                                      const unsigned char &r,
+                                      const unsigned char &g,
+                                      const unsigned char &b);
+
+  ColorOcTreeNode *integrateNodeColor(const float &x, const float &y,
+                                      const float &z, const unsigned char &r,
+                                      const unsigned char &g,
+                                      const unsigned char &b) {
+    OcTreeKey key;
+    if (!this->coordToKeyChecked(point3d(x, y, z), key))
+      return nullptr;
+    return integrateNodeColor(key, r, g, b);
+  }
+
+  // update inner nodes, sets color to average child color
+  void updateInnerOccupancy();
+
+  // uses gnuplot to plot a RGB histogram in EPS format
+  void writeColorHistogram(std::string filename);
+
+protected:
+  void updateInnerOccupancyRecurs(ColorOcTreeNode *node, unsigned int depth);
+
+  /**
+   * Static member object which ensures that this OcTree's prototype
+   * ends up in the classIDMapping only once
+   */
+  class StaticMemberInitializer {
   public:
-    /// Default constructor, sets resolution of leafs
-    ColorOcTree(double resolution) : OccupancyOcTreeBase<ColorOcTreeNode>(resolution) {};  
-      
-    /// virtual constructor: creates a new object of same type
-    /// (Covariant return type requires an up-to-date compiler)
-    ColorOcTree* create() const {return new ColorOcTree(resolution); }
-
-    std::string getTreeType() const {return "ColorOcTree";}
-   
-    // set node color at given key or coordinate. Replaces previous color.
-    ColorOcTreeNode* setNodeColor(const OcTreeKey& key, const unsigned char& r, 
-                                 const unsigned char& g, const unsigned char& b);
-
-    ColorOcTreeNode* setNodeColor(const float& x, const float& y, 
-                                 const float& z, const unsigned char& r, 
-                                 const unsigned char& g, const unsigned char& b) {
-      OcTreeKey key;
-      if (!this->coordToKeyChecked(point3d(x,y,z), key)) return nullptr;
-      return setNodeColor(key,r,g,b);
+    StaticMemberInitializer() {
+      ColorOcTree *tree = new ColorOcTree(0.1);
+      AbstractOcTree::registerTreeType(tree);
     }
-
-    // integrate color measurement at given key or coordinate. Average with previous color
-    ColorOcTreeNode* averageNodeColor(const OcTreeKey& key, const unsigned char& r, 
-                                  const unsigned char& g, const unsigned char& b);
-    
-    ColorOcTreeNode* averageNodeColor(const float& x, const float& y, 
-                                      const float& z, const unsigned char& r, 
-                                      const unsigned char& g, const unsigned char& b) {
-      OcTreeKey key;
-      if (!this->coordToKeyChecked(point3d(x,y,z), key)) return nullptr;
-      return averageNodeColor(key,r,g,b);
-    }
-
-    // integrate color measurement at given key or coordinate. Average with previous color
-    ColorOcTreeNode* integrateNodeColor(const OcTreeKey& key, const unsigned char& r, 
-                                  const unsigned char& g, const unsigned char& b);
-    
-    ColorOcTreeNode* integrateNodeColor(const float& x, const float& y, 
-                                      const float& z, const unsigned char& r, 
-                                      const unsigned char& g, const unsigned char& b) {
-      OcTreeKey key;
-      if (!this->coordToKeyChecked(point3d(x,y,z), key)) return nullptr;
-      return integrateNodeColor(key,r,g,b);
-    }
-
-    // update inner nodes, sets color to average child color
-    void updateInnerOccupancy();
-
-    // uses gnuplot to plot a RGB histogram in EPS format
-    void writeColorHistogram(std::string filename);
-    
-  protected:
-    void updateInnerOccupancyRecurs(ColorOcTreeNode* node, unsigned int depth);
-
-    /**
-     * Static member object which ensures that this OcTree's prototype
-     * ends up in the classIDMapping only once
-     */
-    class StaticMemberInitializer{
-       public:
-         StaticMemberInitializer() {
-           ColorOcTree* tree = new ColorOcTree(0.1);
-           AbstractOcTree::registerTreeType(tree);
-         }
-    };
-    /// static member to ensure static initialization (only once)
-    static StaticMemberInitializer colorOcTreeMemberInit;
-
   };
+  /// static member to ensure static initialization (only once)
+  static StaticMemberInitializer colorOcTreeMemberInit;
+};
 
-  //! user friendly output in format (r g b)
-  std::ostream & operator<<(std::ostream& out, ColorOcTreeNode::Color const& c);
+//! user friendly output in format (r g b)
+std::ostream &operator<<(std::ostream &out, ColorOcTreeNode::Color const &c);
 
 } // end namespace
 

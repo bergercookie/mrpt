@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_H
 #define OCTOMAP_OCTREE_H
 
@@ -48,55 +49,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OccupancyOcTreeBase.h"
 #include "OcTreeNode.h"
+#include "OccupancyOcTreeBase.h"
 #include "ScanGraph.h"
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 
 namespace octomap {
 
+/**
+ * octomap main map data structure, stores 3D occupancy grid map in an OcTree.
+ * Basic functionality is implemented in OcTreeBase.
+ *
+ */
+class OcTree : public OccupancyOcTreeBase<OcTreeNode> {
+
+public:
+  /// Default constructor, sets resolution of leafs
+  OcTree(double resolution) : OccupancyOcTreeBase<OcTreeNode>(resolution){};
+
   /**
-   * octomap main map data structure, stores 3D occupancy grid map in an OcTree.
-   * Basic functionality is implemented in OcTreeBase.
+   * Reads an OcTree from a binary file
+  * @param _filename
    *
    */
-  class OcTree : public OccupancyOcTreeBase <OcTreeNode> {
+  OcTree(std::string _filename);
 
+  virtual ~OcTree(){};
+
+  /// virtual constructor: creates a new object of same type
+  /// (Covariant return type requires an up-to-date compiler)
+  OcTree *create() const { return new OcTree(resolution); }
+
+  std::string getTreeType() const { return "OcTree"; }
+
+protected:
+  /**
+   * Static member object which ensures that this OcTree's prototype
+   * ends up in the classIDMapping only once
+   */
+  class StaticMemberInitializer {
   public:
-    /// Default constructor, sets resolution of leafs
-    OcTree(double resolution) : OccupancyOcTreeBase<OcTreeNode>(resolution) {};
-
-    /**
-     * Reads an OcTree from a binary file 
-    * @param _filename
-     *
-     */
-    OcTree(std::string _filename);
-
-    virtual ~OcTree(){};
-
-    /// virtual constructor: creates a new object of same type
-    /// (Covariant return type requires an up-to-date compiler)
-    OcTree* create() const {return new OcTree(resolution); }
-
-    std::string getTreeType() const {return "OcTree";}
-
-
-  protected:
-    /**
-     * Static member object which ensures that this OcTree's prototype
-     * ends up in the classIDMapping only once
-     */
-    class StaticMemberInitializer{
-    public:
-      StaticMemberInitializer() {
-        OcTree* tree = new OcTree(0.1);
-        AbstractOcTree::registerTreeType(tree);
-      }
-    };
-    /// to ensure static initialization (only once)
-    static StaticMemberInitializer ocTreeMemberInit;
+    StaticMemberInitializer() {
+      OcTree *tree = new OcTree(0.1);
+      AbstractOcTree::registerTreeType(tree);
+    }
   };
+  /// to ensure static initialization (only once)
+  static StaticMemberInitializer ocTreeMemberInit;
+};
 
 } // end namespace
 

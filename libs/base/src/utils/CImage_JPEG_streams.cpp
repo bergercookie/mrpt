@@ -5,9 +5,10 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
-#include "base-precomp.h"  // Precompiled headers
+#include "base-precomp.h" // Precompiled headers
 
 #include <mrpt/utils/CImage.h>
 #include <mrpt/utils/CStream.h>
@@ -19,7 +20,8 @@ using namespace mrpt;
 using namespace mrpt::utils;
 
 // ---------------------------------------------------------------------------------------
-//							START OF JPEG FUNCTIONS PART
+//							START OF JPEG FUNCTIONS
+//PART
 // ---------------------------------------------------------------------------------------
 /* Expanded data destination object for stdio output */
 
@@ -34,28 +36,27 @@ using namespace mrpt::utils;
 //  own jpeglib and runtime checks of expected type-sizes fail
 //  causing asserts.... (fix: JLBC 20/OCT/2008)
 #if MRPT_HAS_JPEG_SYSTEM
-	// Normal: System libraries (typ. unix)
-	#include <jpeglib.h>
+// Normal: System libraries (typ. unix)
+#include <jpeglib.h>
 
-	// Convert mrpt-names to normal ones:
-	#define mrpt_jpeg_source_mgr	jpeg_source_mgr
+// Convert mrpt-names to normal ones:
+#define mrpt_jpeg_source_mgr jpeg_source_mgr
 
-#elif MRPT_HAS_JPEG   // Built-in version
-	#include "jpeglib/mrpt_jpeglib.h"
-	#define mrpt_jpeg_source_mgr	jpeg_source_mgr
+#elif MRPT_HAS_JPEG // Built-in version
+#include "jpeglib/mrpt_jpeglib.h"
+#define mrpt_jpeg_source_mgr jpeg_source_mgr
 #endif
 
-typedef struct
-{
-	struct jpeg_destination_mgr pub; /* public fields */
+typedef struct {
+  struct jpeg_destination_mgr pub; /* public fields */
 
-	CStream * out;		/* target stream */
-	JOCTET * buffer;		/* start of buffer */
+  CStream *out;   /* target stream */
+  JOCTET *buffer; /* start of buffer */
 } mrpt_destination_mgr;
 
-typedef mrpt_destination_mgr * mrpt_dest_ptr;
+typedef mrpt_destination_mgr *mrpt_dest_ptr;
 
-#define OUTPUT_BUF_SIZE  4096	/* choose an efficiently fwrite'able size */
+#define OUTPUT_BUF_SIZE 4096 /* choose an efficiently fwrite'able size */
 
 /*
  * Initialize destination --- called by jpeg_start_compress
@@ -63,19 +64,16 @@ typedef mrpt_destination_mgr * mrpt_dest_ptr;
  */
 
 METHODDEF(void)
-init_destination (j_compress_ptr cinfo)
-{
-mrpt_dest_ptr dest = (mrpt_dest_ptr) cinfo->dest;
+init_destination(j_compress_ptr cinfo) {
+  mrpt_dest_ptr dest = (mrpt_dest_ptr)cinfo->dest;
 
   /* Allocate the output buffer --- it will be released when done with image */
-  dest->buffer = (JOCTET *)
-	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  OUTPUT_BUF_SIZE * sizeof(JOCTET));
+  dest->buffer = (JOCTET *)(*cinfo->mem->alloc_small)(
+      (j_common_ptr)cinfo, JPOOL_IMAGE, OUTPUT_BUF_SIZE * sizeof(JOCTET));
 
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
 }
-
 
 /*
  * Empty the output buffer --- called whenever buffer fills up.
@@ -101,18 +99,16 @@ mrpt_dest_ptr dest = (mrpt_dest_ptr) cinfo->dest;
  */
 
 METHODDEF(boolean)
-empty_output_buffer (j_compress_ptr cinfo)
-{
-  mrpt_dest_ptr dest = (mrpt_dest_ptr) cinfo->dest;
+empty_output_buffer(j_compress_ptr cinfo) {
+  mrpt_dest_ptr dest = (mrpt_dest_ptr)cinfo->dest;
 
-  dest->out->WriteBuffer( dest->buffer, OUTPUT_BUF_SIZE);
+  dest->out->WriteBuffer(dest->buffer, OUTPUT_BUF_SIZE);
 
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
 
   return TRUE;
 }
-
 
 /*
  * Terminate destination --- called by jpeg_finish_compress
@@ -124,20 +120,17 @@ empty_output_buffer (j_compress_ptr cinfo)
  */
 
 METHODDEF(void)
-term_destination (j_compress_ptr cinfo)
-{
-  mrpt_dest_ptr dest = (mrpt_dest_ptr) cinfo->dest;
+term_destination(j_compress_ptr cinfo) {
+  mrpt_dest_ptr dest = (mrpt_dest_ptr)cinfo->dest;
   size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
 
   /* Write any data remaining in the buffer */
   if (datacount > 0)
-	dest->out->WriteBuffer( dest->buffer, (int)datacount);
-
+    dest->out->WriteBuffer(dest->buffer, (int)datacount);
 }
 
 GLOBAL(void)
-jpeg_stdio_dest (j_compress_ptr cinfo, CStream * out)
-{
+jpeg_stdio_dest(j_compress_ptr cinfo, CStream *out) {
   mrpt_dest_ptr dest;
 
   /* The destination object is made permanent so that multiple JPEG images
@@ -146,13 +139,12 @@ jpeg_stdio_dest (j_compress_ptr cinfo, CStream * out)
    * manager serially with the same JPEG object, because their private object
    * sizes may be different.  Caveat programmer.
    */
-  if (cinfo->dest == nullptr) {	/* first time for this JPEG object? */
-	cinfo->dest = (jpeg_destination_mgr *)
-		(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  sizeof(mrpt_destination_mgr));
+  if (cinfo->dest == nullptr) { /* first time for this JPEG object? */
+    cinfo->dest = (jpeg_destination_mgr *)(*cinfo->mem->alloc_small)(
+        (j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(mrpt_destination_mgr));
   }
 
-  dest = (mrpt_dest_ptr) cinfo->dest;
+  dest = (mrpt_dest_ptr)cinfo->dest;
   dest->pub.init_destination = init_destination;
   dest->pub.empty_output_buffer = empty_output_buffer;
   dest->pub.term_destination = term_destination;
@@ -163,17 +155,16 @@ jpeg_stdio_dest (j_compress_ptr cinfo, CStream * out)
 
 /* Expanded data source object for stdio input */
 
-typedef struct
-{
-  mrpt_jpeg_source_mgr pub;	/* public fields */
-  CStream * in;		/* source stream */
-  JOCTET * buffer;		/* start of buffer */
-  boolean start_of_file;	/* have we gotten any data yet? */
+typedef struct {
+  mrpt_jpeg_source_mgr pub; /* public fields */
+  CStream *in;              /* source stream */
+  JOCTET *buffer;           /* start of buffer */
+  boolean start_of_file;    /* have we gotten any data yet? */
 } my_source_mgr;
 
-typedef my_source_mgr * my_src_ptr;
+typedef my_source_mgr *my_src_ptr;
 
-#define INPUT_BUF_SIZE  4096	/* choose an efficiently fread'able size */
+#define INPUT_BUF_SIZE 4096 /* choose an efficiently fread'able size */
 
 /*
  * Initialize source --- called by jpeg_read_header
@@ -181,9 +172,8 @@ typedef my_source_mgr * my_src_ptr;
  */
 
 METHODDEF(void)
-init_source (j_decompress_ptr cinfo)
-{
-  my_src_ptr src = (my_src_ptr) cinfo->src;
+init_source(j_decompress_ptr cinfo) {
+  my_src_ptr src = (my_src_ptr)cinfo->src;
 
   /* We reset the empty-input-file flag for each image,
    * but we don't clear the input buffer.
@@ -191,7 +181,6 @@ init_source (j_decompress_ptr cinfo)
    */
   src->start_of_file = TRUE;
 }
-
 
 /*
  * Fill the input buffer --- called whenever buffer is emptied.
@@ -227,24 +216,22 @@ init_source (j_decompress_ptr cinfo)
  */
 
 METHODDEF(boolean)
-fill_input_buffer (j_decompress_ptr cinfo)
-{
-  my_src_ptr src = (my_src_ptr) cinfo->src;
+fill_input_buffer(j_decompress_ptr cinfo) {
+  my_src_ptr src = (my_src_ptr)cinfo->src;
   size_t nbytes;
 
-  nbytes = src->in->ReadBuffer( src->buffer, INPUT_BUF_SIZE);
+  nbytes = src->in->ReadBuffer(src->buffer, INPUT_BUF_SIZE);
 
-  if (nbytes <= 0)
-  {
-	if (src->start_of_file)	/* Treat empty input file as fatal error */
-	{
-		THROW_EXCEPTION("Error looking for JPEG start data!")
-	}
+  if (nbytes <= 0) {
+    if (src->start_of_file) /* Treat empty input file as fatal error */
+    {
+      THROW_EXCEPTION("Error looking for JPEG start data!")
+    }
 
-	/* Insert a fake EOI marker */
-	src->buffer[0] = (JOCTET) 0xFF;
-	src->buffer[1] = (JOCTET) JPEG_EOI;
-	nbytes = 2;
+    /* Insert a fake EOI marker */
+    src->buffer[0] = (JOCTET)0xFF;
+    src->buffer[1] = (JOCTET)JPEG_EOI;
+    nbytes = 2;
   }
 
   src->pub.next_input_byte = src->buffer;
@@ -253,7 +240,6 @@ fill_input_buffer (j_decompress_ptr cinfo)
 
   return TRUE;
 }
-
 
 /*
  * Skip data --- used to skip over a potentially large amount of
@@ -268,27 +254,25 @@ fill_input_buffer (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-skip_input_data (j_decompress_ptr cinfo, long num_bytes)
-{
-  my_src_ptr src = (my_src_ptr) cinfo->src;
+skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
+  my_src_ptr src = (my_src_ptr)cinfo->src;
 
   /* Just a dumb implementation for now.  Could use fseek() except
    * it doesn't work on pipes.  Not clear that being smart is worth
    * any trouble anyway --- large skips are infrequent.
    */
   if (num_bytes > 0) {
-	while (num_bytes > (long) src->pub.bytes_in_buffer) {
-	  num_bytes -= (long) src->pub.bytes_in_buffer;
-	  (void) fill_input_buffer(cinfo);
-	  /* note we assume that fill_input_buffer will never return FALSE,
-	   * so suspension need not be handled.
-	   */
-	}
-	src->pub.next_input_byte += (size_t) num_bytes;
-	src->pub.bytes_in_buffer -= (size_t) num_bytes;
+    while (num_bytes > (long)src->pub.bytes_in_buffer) {
+      num_bytes -= (long)src->pub.bytes_in_buffer;
+      (void)fill_input_buffer(cinfo);
+      /* note we assume that fill_input_buffer will never return FALSE,
+       * so suspension need not be handled.
+       */
+    }
+    src->pub.next_input_byte += (size_t)num_bytes;
+    src->pub.bytes_in_buffer -= (size_t)num_bytes;
   }
 }
-
 
 /*
  * An additional method that can be provided by data source modules is the
@@ -297,7 +281,6 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
  * provided by the JPEG library.  That method assumes that no backtracking
  * is possible.
  */
-
 
 /*
  * Terminate source --- called by jpeg_finish_decompress
@@ -309,12 +292,10 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
  */
 
 METHODDEF(void)
-term_source (j_decompress_ptr cinfo)
-{
-	MRPT_UNUSED_PARAM(cinfo);
+term_source(j_decompress_ptr cinfo) {
+  MRPT_UNUSED_PARAM(cinfo);
   /* no work necessary here */
 }
-
 
 /*
  * Prepare for input from a stdio stream.
@@ -323,8 +304,7 @@ term_source (j_decompress_ptr cinfo)
  */
 
 GLOBAL(void)
-jpeg_stdio_src (j_decompress_ptr cinfo, CStream * in)
-{
+jpeg_stdio_src(j_decompress_ptr cinfo, CStream *in) {
   my_src_ptr src;
 
   /* The source object and input buffer are made permanent so that a series
@@ -334,18 +314,15 @@ jpeg_stdio_src (j_decompress_ptr cinfo, CStream * in)
    * This makes it unsafe to use this manager and a different source
    * manager serially with the same JPEG object.  Caveat programmer.
    */
-  if (cinfo->src == nullptr)
-  {	/* first time for this JPEG object? */
-	cinfo->src = (mrpt_jpeg_source_mgr *)
-		(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  sizeof(my_source_mgr));
-	src = (my_src_ptr) cinfo->src;
-	src->buffer = (JOCTET *)
-	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  INPUT_BUF_SIZE * sizeof(JOCTET));
+  if (cinfo->src == nullptr) { /* first time for this JPEG object? */
+    cinfo->src = (mrpt_jpeg_source_mgr *)(*cinfo->mem->alloc_small)(
+        (j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(my_source_mgr));
+    src = (my_src_ptr)cinfo->src;
+    src->buffer = (JOCTET *)(*cinfo->mem->alloc_small)(
+        (j_common_ptr)cinfo, JPOOL_PERMANENT, INPUT_BUF_SIZE * sizeof(JOCTET));
   }
 
-  src = (my_src_ptr) cinfo->src;
+  src = (my_src_ptr)cinfo->src;
   src->pub.init_source = init_source;
   src->pub.fill_input_buffer = fill_input_buffer;
   src->pub.skip_input_data = skip_input_data;
@@ -357,231 +334,214 @@ jpeg_stdio_src (j_decompress_ptr cinfo, CStream * in)
 }
 
 // ---------------------------------------------------------------------------------------
-//							END OF JPEG FUNCTIONS PART
+//							END OF JPEG FUNCTIONS
+//PART
 // ---------------------------------------------------------------------------------------
 
-
-
 /*---------------------------------------------------------------
-					saveToStreamAsJPEG
+                                        saveToStreamAsJPEG
  ---------------------------------------------------------------*/
-void  CImage::saveToStreamAsJPEG( CStream &out, const int jpeg_quality ) const
-{
+void CImage::saveToStreamAsJPEG(CStream &out, const int jpeg_quality) const {
 #if MRPT_HAS_OPENCV
-	MRPT_START
+  MRPT_START
 
-	makeSureImageIsLoaded();   // For delayed loaded images stored externally
+  makeSureImageIsLoaded(); // For delayed loaded images stored externally
 
-	struct jpeg_compress_struct		cinfo;
-	struct jpeg_error_mgr			jerr;
+  struct jpeg_compress_struct cinfo;
+  struct jpeg_error_mgr jerr;
 
-	const IplImage *ipl = static_cast<const IplImage*>(img);
+  const IplImage *ipl = static_cast<const IplImage *>(img);
 
-	const unsigned int nCols = ipl->width;
-	const unsigned int nRows = ipl->height;
-	const bool is_color = (ipl->nChannels==3);
+  const unsigned int nCols = ipl->width;
+  const unsigned int nRows = ipl->height;
+  const bool is_color = (ipl->nChannels == 3);
 
+  // Some previous verification:
+  ASSERT_(nCols >= 1 && nRows >= 1)
+  ASSERT_(ipl)
+  ASSERT_(ipl->nChannels == 1 || ipl->nChannels == 3)
 
-	// Some previous verification:
-	ASSERT_(nCols>=1 && nRows>=1)
-	ASSERT_(ipl)
-	ASSERT_(ipl->nChannels == 1 || ipl->nChannels == 3)
+  // 1) Initialization of the JPEG compresion object:
+  // --------------------------------------------------
+  cinfo.err = jpeg_std_error(&jerr);
+  jpeg_create_compress(&cinfo);
 
-	// 1) Initialization of the JPEG compresion object:
-	// --------------------------------------------------
-	cinfo.err =  jpeg_std_error(&jerr);
-	 jpeg_create_compress(&cinfo);
+  // 2) Set the destination of jpeg data:
+  // --------------------------------------------------
+  jpeg_stdio_dest(&cinfo, &out);
 
-	// 2) Set the destination of jpeg data:
-	// --------------------------------------------------
-	jpeg_stdio_dest( &cinfo, &out );
+  // 3) Set parameters for compression:
+  // --------------------------------------------------
+  cinfo.image_width = nCols;
+  cinfo.image_height = nRows;
+  cinfo.input_components = is_color ? 3 : 1;
+  cinfo.in_color_space = is_color ? JCS_RGB : JCS_GRAYSCALE;
 
-	// 3) Set parameters for compression:
-	// --------------------------------------------------
-	cinfo.image_width = nCols;
-	cinfo.image_height = nRows;
-	cinfo.input_components = is_color ? 3:1;
-	cinfo.in_color_space = is_color ? JCS_RGB : JCS_GRAYSCALE;
+  jpeg_set_defaults(&cinfo);
+  /* Make optional parameter settings here */
+  /* Now you can set any non-default parameters you wish to.
+  * Here we just illustrate the use of quality (quantization table) scaling:
+  */
+  jpeg_set_quality(&cinfo, jpeg_quality /* quality per cent */,
+                   TRUE /* limit to baseline-JPEG values */);
 
-	jpeg_set_defaults(&cinfo);
-	/* Make optional parameter settings here */
-	/* Now you can set any non-default parameters you wish to.
-	* Here we just illustrate the use of quality (quantization table) scaling:
-	*/
-	jpeg_set_quality(&cinfo, jpeg_quality /* quality per cent */, TRUE /* limit to baseline-JPEG values */);
+  // 4) Start:
+  // --------------------------------------------------
+  jpeg_start_compress(&cinfo, TRUE);
 
-	// 4) Start:
-	// --------------------------------------------------
-	jpeg_start_compress(&cinfo, TRUE);
+  // 5) Write scan lines:
+  // --------------------------------------------------
+  if (is_color) {
+    JSAMPROW row_pointer[1]; /* pointer to a single row */
+    row_pointer[0] = (JSAMPROW) new char[ipl->widthStep];
 
-	// 5) Write scan lines:
-	// --------------------------------------------------
-	if (is_color)
-	{
-		JSAMPROW row_pointer[1];		/* pointer to a single row */
-		row_pointer[0] = (JSAMPROW)new char[ ipl->widthStep ];
+    for (unsigned int row = 0; row < nRows; row++) {
+      // Flip RGB bytes order!
+      char *src;
+      if (ipl->origin == 0)
+        src = &ipl->imageData[row * ipl->widthStep];
+      else
+        src = &ipl->imageData[(nRows - 1 - row) * ipl->widthStep];
+      char *target = (char *)row_pointer[0];
+      for (unsigned int col = 0; col < nCols; col++) {
+        target[0] = src[2];
+        target[1] = src[1];
+        target[2] = src[0];
 
-		for (unsigned int row = 0; row<nRows;row++)
-		{
-			// Flip RGB bytes order!
-			char *src;
-			if (ipl->origin == 0)
-					src = &ipl->imageData[ row * ipl->widthStep ];
-			else	src = &ipl->imageData[ (nRows-1-row) * ipl->widthStep ];
-			char *target = (char *)row_pointer[0];
-			for (unsigned int col=0;col<nCols;col++)
-			{
-				target[0] = src[2];
-				target[1] = src[1];
-				target[2] = src[0];
+        target += 3;
+        src += 3;
+      }
 
-				target+=3;
-				src+=3;
-			}
+      if (1 != jpeg_write_scanlines(&cinfo, row_pointer, 1)) {
+        THROW_EXCEPTION("jpeg_write_scanlines: didn't work!!");
+      }
+    }
 
-			if (1!=  jpeg_write_scanlines(&cinfo, row_pointer, 1))
-			{
-				THROW_EXCEPTION("jpeg_write_scanlines: didn't work!!");
-			}
-		}
+    delete[] row_pointer[0];
+  }                          // end "color"
+  else {                     // Is grayscale:
+    JSAMPROW row_pointer[1]; /* pointer to a single row */
 
-		delete[] row_pointer[0];
-	} // end "color"
-	else
-	{	// Is grayscale:
-		JSAMPROW						row_pointer[1];		/* pointer to a single row */
+    for (unsigned int row = 0; row < nRows; row++) {
+      if (ipl->origin == 0)
+        row_pointer[0] = (JSAMPROW)&ipl->imageData[row * ipl->widthStep];
+      else
+        row_pointer[0] =
+            (JSAMPROW)&ipl->imageData[(nRows - 1 - row) * ipl->widthStep];
 
-		for (unsigned int row = 0; row<nRows;row++)
-		{
-			if (ipl->origin == 0)
-					row_pointer[0] = (JSAMPROW) &ipl->imageData[ row * ipl->widthStep ];
-			else	row_pointer[0] = (JSAMPROW) &ipl->imageData[ (nRows-1-row) * ipl->widthStep ];
+      // Gray scale:
+      if (1 != jpeg_write_scanlines(&cinfo, row_pointer, 1)) {
+        THROW_EXCEPTION("jpeg_write_scanlines: didn't work!!");
+      }
+    }
+  }
 
-			// Gray scale:
-			if (1!=  jpeg_write_scanlines(&cinfo, row_pointer, 1))
-			{
-				THROW_EXCEPTION("jpeg_write_scanlines: didn't work!!");
-			}
-		}
-	}
+  // 6) Compress and finish:
+  // --------------------------------------------------
+  jpeg_finish_compress(&cinfo);
+  jpeg_destroy_compress(&cinfo);
 
-	// 6) Compress and finish:
-	// --------------------------------------------------
-	jpeg_finish_compress(&cinfo);
-	jpeg_destroy_compress(&cinfo);
-
-	// DONE!
-	MRPT_END
+  // DONE!
+  MRPT_END
 #endif
 }
 
-
 /*---------------------------------------------------------------
-					saveToStreamAsJPEG
+                                        saveToStreamAsJPEG
  ---------------------------------------------------------------*/
-void  CImage::loadFromStreamAsJPEG( CStream &in )
-{
+void CImage::loadFromStreamAsJPEG(CStream &in) {
 #if MRPT_HAS_OPENCV
-	MRPT_START
+  MRPT_START
 
-	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr         jerr;
+  struct jpeg_decompress_struct cinfo;
+  struct jpeg_error_mgr jerr;
 
-	/* Step 1: allocate and initialize JPEG decompression object */
+  /* Step 1: allocate and initialize JPEG decompression object */
 
-	/* We set up the normal JPEG error routines, then override error_exit. */
-	cinfo.err =  jpeg_std_error(&jerr);
+  /* We set up the normal JPEG error routines, then override error_exit. */
+  cinfo.err = jpeg_std_error(&jerr);
 
-	/* Now we can initialize the JPEG decompression object. */
-	jpeg_create_decompress(&cinfo);
+  /* Now we can initialize the JPEG decompression object. */
+  jpeg_create_decompress(&cinfo);
 
-	/* Step 2: specify data source (eg, a file) */
-	jpeg_stdio_src(&cinfo, &in);
+  /* Step 2: specify data source (eg, a file) */
+  jpeg_stdio_src(&cinfo, &in);
 
-	/* Step 3: read file parameters with jpeg_read_header() */
-	jpeg_read_header(&cinfo, TRUE);
+  /* Step 3: read file parameters with jpeg_read_header() */
+  jpeg_read_header(&cinfo, TRUE);
 
-	/* Step 4: set parameters for decompression */
+  /* Step 4: set parameters for decompression */
 
-	/* Step 5: Start decompressor */
-	jpeg_start_decompress(&cinfo);
+  /* Step 5: Start decompressor */
+  jpeg_start_decompress(&cinfo);
 
-	/* We may need to do some setup of our own at this point before reading
-	* the data.  After jpeg_start_decompress() we have the correct scaled
-	* output image dimensions available, as well as the output colormap
-	* if we asked for color quantization.
-	* In this example, we need to make an output work buffer of the right size.
-	*/
-	/* JSAMPLEs per row in output buffer */
-	/* physical row width in output buffer */
-	const int row_stride = cinfo.output_width * cinfo.output_components;
-	/* Make a one-row-high sample array that will go away when done with image */
-	/* Output row buffer */
-	JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)
-		((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
+  /* We may need to do some setup of our own at this point before reading
+  * the data.  After jpeg_start_decompress() we have the correct scaled
+  * output image dimensions available, as well as the output colormap
+  * if we asked for color quantization.
+  * In this example, we need to make an output work buffer of the right size.
+  */
+  /* JSAMPLEs per row in output buffer */
+  /* physical row width in output buffer */
+  const int row_stride = cinfo.output_width * cinfo.output_components;
+  /* Make a one-row-high sample array that will go away when done with image */
+  /* Output row buffer */
+  JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo,
+                                                 JPOOL_IMAGE, row_stride, 1);
 
+  // Resize the CImage now:
+  this->changeSize(cinfo.output_width, cinfo.output_height,
+                   cinfo.out_color_components, true);
+  IplImage *ipl = static_cast<IplImage *>(img);
 
-	// Resize the CImage now:
-	this->changeSize( cinfo.output_width, cinfo.output_height, cinfo.out_color_components, true );
-	IplImage *ipl = static_cast<IplImage*>(img);
+  /* Step 6: while (scan lines remain to be read) */
+  /*           jpeg_read_scanlines(...); */
 
-	/* Step 6: while (scan lines remain to be read) */
-	/*           jpeg_read_scanlines(...); */
+  /* Here we use the library's state variable cinfo.output_scanline as the
+  * loop counter, so that we don't have to keep track ourselves.
+  */
+  const unsigned int nCols = cinfo.output_width;
+  const unsigned int nRows = cinfo.output_height;
 
-	/* Here we use the library's state variable cinfo.output_scanline as the
-	* loop counter, so that we don't have to keep track ourselves.
-	*/
-	const unsigned int nCols = cinfo.output_width;
-	const unsigned int nRows = cinfo.output_height;
+  for (unsigned int row = 0; row < nRows; row++) {
+    /* jpeg_read_scanlines expects an array of pointers to scanlines.
+    * Here the array is only one element long, but you could ask for
+    * more than one scanline at a time if that's more convenient.
+    */
+    jpeg_read_scanlines(&cinfo, buffer, 1);
 
-	for (unsigned int row = 0; row<nRows;row++)
-	{
-		/* jpeg_read_scanlines expects an array of pointers to scanlines.
-		* Here the array is only one element long, but you could ask for
-		* more than one scanline at a time if that's more convenient.
-		*/
-		jpeg_read_scanlines(&cinfo, buffer, 1);
+    /* Copy into the CImage object */
+    if (isColor()) {
+      // Flip RGB bytes order!
+      char *target = &ipl->imageData[row * ipl->widthStep];
+      const char *src = (char *)buffer[0];
+      for (unsigned int col = 0; col < nCols; col++) {
+        target[0] = src[2];
+        target[1] = src[1];
+        target[2] = src[0];
 
-		/* Copy into the CImage object */
-		if (isColor())
-		{
-			// Flip RGB bytes order!
-			char *target = &ipl->imageData[ row * ipl->widthStep ];
-			const char *src = (char *)buffer[0];
-			for (unsigned int col=0;col<nCols;col++)
-			{
-				target[0] = src[2];
-				target[1] = src[1];
-				target[2] = src[0];
+        target += 3;
+        src += 3;
+      }
+    } else {
+      // Gray scale:
+      memcpy(&ipl->imageData[row * ipl->widthStep], buffer[0], row_stride);
+    }
+  }
 
-				target+=3;
-				src+=3;
-			}
-		}
-		else
-		{
-			// Gray scale:
-			memcpy( &ipl->imageData[ row * ipl->widthStep ],
-					buffer[0],
-					row_stride );
-		}
+  /* Step 7: Finish decompression */
 
-	}
+  jpeg_finish_decompress(&cinfo);
+  /* We can ignore the return value since suspension is not possible
+  * with the stdio data source.
+  */
 
-	/* Step 7: Finish decompression */
+  /* Step 8: Release JPEG decompression object */
 
-	jpeg_finish_decompress(&cinfo);
-	/* We can ignore the return value since suspension is not possible
-	* with the stdio data source.
-	*/
+  /* This is an important step since it will release a good deal of memory. */
+  jpeg_destroy_decompress(&cinfo);
 
-	/* Step 8: Release JPEG decompression object */
-
-	/* This is an important step since it will release a good deal of memory. */
-	jpeg_destroy_decompress(&cinfo);
-
-	// DONE!
-	MRPT_END
+  // DONE!
+  MRPT_END
 #endif
 }
-

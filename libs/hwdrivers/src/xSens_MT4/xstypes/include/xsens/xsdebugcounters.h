@@ -5,13 +5,15 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef XSDEBUGCOUNTERS_H
 #define XSDEBUGCOUNTERS_H
 
 #include "xsatomicint.h"
 
-// These counters are only available in the non-public version of the XsTypes library
+// These counters are only available in the non-public version of the XsTypes
+// library
 // For the public version, they will all always have a 0 value.
 
 #ifdef __cplusplus

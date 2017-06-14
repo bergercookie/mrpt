@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_MAP_COLLECTION_H
 #define OCTOMAP_MAP_COLLECTION_H
 
@@ -13,8 +14,10 @@
 
 /**
  * OctoMap:
- * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
- * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011
+ * A probabilistic, flexible, and compact 3D mapping library for robotic
+ * systems.
+ * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+ * 2009-2011
  * @see http://octomap.sourceforge.net/
  * License: New BSD License
  */
@@ -48,66 +51,67 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <vector>
 #include <mrpt/otherlibs/octomap/MapNode.h>
+#include <vector>
 
 namespace octomap {
 
-  
-  template <class MAPNODE>
-  class MapCollection {
-  public:
-    MapCollection();
-    MapCollection(std::string filename);
-    ~MapCollection();
+template <class MAPNODE> class MapCollection {
+public:
+  MapCollection();
+  MapCollection(std::string filename);
+  ~MapCollection();
 
-    void addNode( MAPNODE* node);
-    MAPNODE* addNode(const Pointcloud& cloud, point3d sensor_origin);
-    bool removeNode(const MAPNODE* n);
-    MAPNODE* queryNode(const point3d& p);
+  void addNode(MAPNODE *node);
+  MAPNODE *addNode(const Pointcloud &cloud, point3d sensor_origin);
+  bool removeNode(const MAPNODE *n);
+  MAPNODE *queryNode(const point3d &p);
 
-    bool isOccupied(const point3d& p) const;
-    bool isOccupied(float x, float y, float z) const;
+  bool isOccupied(const point3d &p) const;
+  bool isOccupied(float x, float y, float z) const;
 
-    float getOccupancy(const point3d& p);
+  float getOccupancy(const point3d &p);
 
-    bool castRay(const point3d& origin, const point3d& direction, point3d& end,
-                 bool ignoreUnknownCells=false, double maxRange=-1.0) const;
+  bool castRay(const point3d &origin, const point3d &direction, point3d &end,
+               bool ignoreUnknownCells = false, double maxRange = -1.0) const;
 
-    bool writePointcloud(std::string filename);
-    bool write(std::string filename);
+  bool writePointcloud(std::string filename);
+  bool write(std::string filename);
 
-    // TODO
-    void insertScan(const Pointcloud& scan, const octomap::point3d& sensor_origin,
-                    double maxrange=-1., bool pruning=true, bool lazy_eval = false);
-    // TODO
-    MAPNODE* queryNode(std::string id);
+  // TODO
+  void insertScan(const Pointcloud &scan, const octomap::point3d &sensor_origin,
+                  double maxrange = -1., bool pruning = true,
+                  bool lazy_eval = false);
+  // TODO
+  MAPNODE *queryNode(std::string id);
 
-    typedef typename std::vector<MAPNODE*>::iterator iterator;
-    typedef typename std::vector<MAPNODE*>::const_iterator const_iterator;
-    iterator begin() { return nodes.begin(); }
-    iterator end()   { return nodes.end(); }
-    const_iterator begin() const { return nodes.begin(); }
-    const_iterator end() const { return nodes.end(); }
-    size_t size() const { return nodes.size(); }
-        
-  protected:
-    void clear();
-    bool read(std::string filename);
+  typedef typename std::vector<MAPNODE *>::iterator iterator;
+  typedef typename std::vector<MAPNODE *>::const_iterator const_iterator;
+  iterator begin() { return nodes.begin(); }
+  iterator end() { return nodes.end(); }
+  const_iterator begin() const { return nodes.begin(); }
+  const_iterator end() const { return nodes.end(); }
+  size_t size() const { return nodes.size(); }
 
-    // TODO
-    std::vector<Pointcloud*> segment(const Pointcloud& scan) const;
-    // TODO
-    MAPNODE* associate(const Pointcloud& scan);
+protected:
+  void clear();
+  bool read(std::string filename);
 
-    static void splitPathAndFilename(std::string &filenamefullpath, std::string* path, std::string *filename);
-    static std::string combinePathAndFilename(std::string path, std::string filename);
-    static bool readTagValue(std::string tag, std::ifstream &infile, std::string* value);
-    
-  protected:
+  // TODO
+  std::vector<Pointcloud *> segment(const Pointcloud &scan) const;
+  // TODO
+  MAPNODE *associate(const Pointcloud &scan);
 
-    std::vector<MAPNODE*> nodes;
-  };
+  static void splitPathAndFilename(std::string &filenamefullpath,
+                                   std::string *path, std::string *filename);
+  static std::string combinePathAndFilename(std::string path,
+                                            std::string filename);
+  static bool readTagValue(std::string tag, std::ifstream &infile,
+                           std::string *value);
+
+protected:
+  std::vector<MAPNODE *> nodes;
+};
 
 } // end namespace
 

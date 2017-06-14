@@ -5,34 +5,33 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef SIFT_H
 #define SIFT_H
 
 //#include "cxcore.h"
 // Universal include for all versions of OpenCV
-#include <mrpt/otherlibs/do_opencv_includes.h> 
+#include <mrpt/otherlibs/do_opencv_includes.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /******************************** Structures *********************************/
 
 /** holds feature data relevant to detection */
-struct detection_data
-{
-	int r;
-	int c;
-	int octv;
-	int intvl;
-	double subintvl;
-	double scl_octv;
+struct detection_data {
+  int r;
+  int c;
+  int octv;
+  int intvl;
+  double subintvl;
+  double scl_octv;
 };
 
 struct feature;
-
 
 /******************************* Defs and macros *****************************/
 
@@ -91,8 +90,7 @@ struct feature;
 #define SIFT_INT_DESCR_FCTR 512.0
 
 /* returns a feature's detection data */
-#define feat_detection_data(f) ( (struct detection_data*)(f->feature_data) )
-
+#define feat_detection_data(f) ((struct detection_data *)(f->feature_data))
 
 /*************************** Function Prototypes *****************************/
 
@@ -106,9 +104,7 @@ detected features are stored in the array pointed to by \a feat.
 @return Returns the number of features stored in \a feat or -1 on failure
 @see _sift_features()
 */
-extern int sift_features( IplImage* img, struct feature** feat );
-
-
+extern int sift_features(IplImage *img, struct feature **feat);
 
 /**
 Finda SIFT features in an image using user-specified parameter values.  All
@@ -118,30 +114,30 @@ detected features are stored in the array pointed to by \a feat.
 @param feat a pointer to an array in which to store detected features
 @param intvls the number of intervals sampled per octave of scale space
 @param sigma the amount of Gaussian smoothing applied to each image level
-	before building the scale space representation for an octave
+        before building the scale space representation for an octave
 @param contr_thr a threshold on the value of the scale space function
-	\f$\left|D(\hat{x})\right|\f$, where \f$\hat{x}\f$ is a vector specifying
-	feature location and scale, used to reject unstable features;  assumes
+        \f$\left|D(\hat{x})\right|\f$, where \f$\hat{x}\f$ is a vector
+specifying
+        feature location and scale, used to reject unstable features;  assumes
 pixel values in the range [0, 1]
 @param curv_thr threshold on a feature's ratio of principle curvatures
-	used to reject features that are too edge-like
+        used to reject features that are too edge-like
 @param img_dbl should be 1 if image doubling prior to scale space
-	construction is desired or 0 if not
+        construction is desired or 0 if not
 @param descr_width the width, \f$n\f$, of the \f$n \times n\f$ array of
-	orientation histograms used to compute a feature's descriptor
+        orientation histograms used to compute a feature's descriptor
 @param descr_hist_bins the number of orientations in each of the
-	histograms in the array used to compute a feature's descriptor
+        histograms in the array used to compute a feature's descriptor
 
 @return Returns the number of keypoints stored in \a feat or -1 on failure
 @see sift_features()
 */
-extern int _sift_features( IplImage* img, struct feature** feat, int intvls,
-						  double sigma, double contr_thr, int curv_thr,
-						  int img_dbl, int descr_width, int descr_hist_bins );
-
+extern int _sift_features(IplImage *img, struct feature **feat, int intvls,
+                          double sigma, double contr_thr, int curv_thr,
+                          int img_dbl, int descr_width, int descr_hist_bins);
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif

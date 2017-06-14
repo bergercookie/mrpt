@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_MAP_NODE_H
 #define OCTOMAP_MAP_NODE_H
 
@@ -13,8 +14,10 @@
 
 /**
  * OctoMap:
- * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
- * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011
+ * A probabilistic, flexible, and compact 3D mapping library for robotic
+ * systems.
+ * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+ * 2009-2011
  * @see http://octomap.sourceforge.net/
  * License: New BSD License
  */
@@ -48,45 +51,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string>
 #include <mrpt/otherlibs/octomap/OcTree.h>
+#include <string>
 
 namespace octomap {
 
-  template <class TREETYPE>
-    class MapNode {
-    
-  public:
-    MapNode();
-    MapNode(TREETYPE* node_map, pose6d origin);
-    MapNode(std::string filename, pose6d origin);
-    MapNode(const Pointcloud& cloud, pose6d origin);
-    ~MapNode();
+template <class TREETYPE> class MapNode {
 
-    typedef TREETYPE TreeType;
+public:
+  MapNode();
+  MapNode(TREETYPE *node_map, pose6d origin);
+  MapNode(std::string filename, pose6d origin);
+  MapNode(const Pointcloud &cloud, pose6d origin);
+  ~MapNode();
 
-    TREETYPE* getMap() { return  node_map; }
-    
-    void updateMap(const Pointcloud& cloud, point3d sensor_origin);
+  typedef TREETYPE TreeType;
 
-    inline std::string getId() { return id; }
-    inline void setId(std::string newid) { id = newid; }
+  TREETYPE *getMap() { return node_map; }
 
-    inline pose6d getOrigin() { return origin; }
+  void updateMap(const Pointcloud &cloud, point3d sensor_origin);
 
-    // returns cloud of voxel centers in global reference frame
-    Pointcloud generatePointcloud();
-    bool writeMap(std::string filename);
+  inline std::string getId() { return id; }
+  inline void setId(std::string newid) { id = newid; }
 
-  protected:
-    TREETYPE*    node_map;  // occupancy grid map
-    pose6d       origin;    // origin and orientation relative to parent
-    std::string  id;
+  inline pose6d getOrigin() { return origin; }
 
-    void clear();
-    bool readMap(std::string filename);
+  // returns cloud of voxel centers in global reference frame
+  Pointcloud generatePointcloud();
+  bool writeMap(std::string filename);
 
-  };
+protected:
+  TREETYPE *node_map; // occupancy grid map
+  pose6d origin;      // origin and orientation relative to parent
+  std::string id;
+
+  void clear();
+  bool readMap(std::string filename);
+};
 
 } // end namespace
 

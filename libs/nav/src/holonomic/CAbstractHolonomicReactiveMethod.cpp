@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #include "nav-precomp.h" // Precomp header
 
@@ -16,67 +17,54 @@ using namespace mrpt;
 using namespace mrpt::utils;
 using namespace mrpt::nav;
 
-IMPLEMENTS_VIRTUAL_SERIALIZABLE(CAbstractHolonomicReactiveMethod, CSerializable, mrpt::nav)
+IMPLEMENTS_VIRTUAL_SERIALIZABLE(CAbstractHolonomicReactiveMethod, CSerializable,
+                                mrpt::nav)
 
-
-CAbstractHolonomicReactiveMethod::CAbstractHolonomicReactiveMethod(const std::string &defaultCfgSectionName) :
-	m_associatedPTG(nullptr),
-	m_enableApproachTargetSlowDown(true),
-	m_cfgSectionName(defaultCfgSectionName)
-{
-}
-CAbstractHolonomicReactiveMethod::~CAbstractHolonomicReactiveMethod()
-{
-}
+CAbstractHolonomicReactiveMethod::CAbstractHolonomicReactiveMethod(
+    const std::string &defaultCfgSectionName)
+    : m_associatedPTG(nullptr), m_enableApproachTargetSlowDown(true),
+      m_cfgSectionName(defaultCfgSectionName) {}
+CAbstractHolonomicReactiveMethod::~CAbstractHolonomicReactiveMethod() {}
 
 /** Defines the name of the section (Default: "FULL_EVAL_CONFIG") */
-void CAbstractHolonomicReactiveMethod::setConfigFileSectionName(const std::string &sectName)
-{
-	m_cfgSectionName = sectName;
+void CAbstractHolonomicReactiveMethod::setConfigFileSectionName(
+    const std::string &sectName) {
+  m_cfgSectionName = sectName;
 }
 std::string CAbstractHolonomicReactiveMethod::getConfigFileSectionName() const {
-	return m_cfgSectionName;
+  return m_cfgSectionName;
 }
 
-void CAbstractHolonomicReactiveMethod::setAssociatedPTG(mrpt::nav::CParameterizedTrajectoryGenerator *ptg)
-{
-	m_associatedPTG = ptg;
+void CAbstractHolonomicReactiveMethod::setAssociatedPTG(
+    mrpt::nav::CParameterizedTrajectoryGenerator *ptg) {
+  m_associatedPTG = ptg;
 }
-mrpt::nav::CParameterizedTrajectoryGenerator * CAbstractHolonomicReactiveMethod::getAssociatedPTG() const
-{
-	return m_associatedPTG;
-}
-
-CAbstractHolonomicReactiveMethod::Ptr CAbstractHolonomicReactiveMethod::Factory(const std::string &className) noexcept
-{
-	try 
-	{
-		mrpt::utils::registerAllPendingClasses();
-
-		// Factory:
-		const mrpt::utils::TRuntimeClassId *classId = mrpt::utils::findRegisteredClass( className );
-		if (!classId) return nullptr;
-
-		return CAbstractHolonomicReactiveMethod::Ptr(
-				dynamic_cast<CAbstractHolonomicReactiveMethod*>( classId->createObject() ));
-	}
-	catch (...)
-	{
-		return nullptr;
-	}
+mrpt::nav::CParameterizedTrajectoryGenerator *
+CAbstractHolonomicReactiveMethod::getAssociatedPTG() const {
+  return m_associatedPTG;
 }
 
+CAbstractHolonomicReactiveMethod::Ptr CAbstractHolonomicReactiveMethod::Factory(
+    const std::string &className) noexcept {
+  try {
+    mrpt::utils::registerAllPendingClasses();
 
-CAbstractHolonomicReactiveMethod::NavInput::NavInput() :
-	targets(),
-	maxRobotSpeed(1.0),
-	maxObstacleDist(1.0),
-	clearance(nullptr)
-{
+    // Factory:
+    const mrpt::utils::TRuntimeClassId *classId =
+        mrpt::utils::findRegisteredClass(className);
+    if (!classId)
+      return nullptr;
+
+    return CAbstractHolonomicReactiveMethod::Ptr(
+        dynamic_cast<CAbstractHolonomicReactiveMethod *>(
+            classId->createObject()));
+  } catch (...) {
+    return nullptr;
+  }
 }
 
-CAbstractHolonomicReactiveMethod::NavOutput::NavOutput() :
-	desiredDirection(0),
-	desiredSpeed(0)
-{
-}
+CAbstractHolonomicReactiveMethod::NavInput::NavInput()
+    : targets(), maxRobotSpeed(1.0), maxObstacleDist(1.0), clearance(nullptr) {}
+
+CAbstractHolonomicReactiveMethod::NavOutput::NavOutput()
+    : desiredDirection(0), desiredSpeed(0) {}

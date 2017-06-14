@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 // $Id: octomap.h 171 2011-01-20 13:56:28Z kai_wurm $
 
 /**
@@ -45,8 +46,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "octomap_types.h"
+#include "OcTree.h"
 #include "Pointcloud.h"
 #include "ScanGraph.h"
-#include "OcTree.h"
-
+#include "octomap_types.h"

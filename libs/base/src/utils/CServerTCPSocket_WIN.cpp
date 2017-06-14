@@ -5,10 +5,10 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
-#include "base-precomp.h"  // Precompiled headers
-
+#include "base-precomp.h" // Precompiled headers
 
 #include <MRPT/config.h>
 
@@ -16,56 +16,51 @@
 
 #include <winsock.h>
 #if (__BORLANDC__) || (_MSC_VER)
-#	pragma comment (lib,"WS2_32.LIB")
+#pragma comment(lib, "WS2_32.LIB")
 #endif
 
-#include <mrpt/utils/CServerTCPSocket.h>
-#include <mrpt/utils/CClientTCPSocket.h>
 #include <mrpt/system/os.h>
+#include <mrpt/utils/CClientTCPSocket.h>
+#include <mrpt/utils/CServerTCPSocket.h>
 
 using namespace mrpt::utils;
 
 /*---------------------------------------------------------------
-					Constructor
+                                        Constructor
  ---------------------------------------------------------------*/
-CServerTCPSocket::CServerTCPSocket(
-	unsigned short		listenPort,
-	const std::string	&IPaddress,
-	int					maxConnectionsWaiting,
-	mrpt::utils::VerbosityLevel verbosityLevel
-	) :
-		COutputLogger("CServerTCPSocket")
-{
-	MRPT_START
-	setVerbosityLevel(verbosityLevel);
+CServerTCPSocket::CServerTCPSocket(unsigned short listenPort,
+                                   const std::string &IPaddress,
+                                   int maxConnectionsWaiting,
+                                   mrpt::utils::VerbosityLevel verbosityLevel)
+    : COutputLogger("CServerTCPSocket") {
+  MRPT_START
+  setVerbosityLevel(verbosityLevel);
 
-	// Init the WinSock Library:
-	// ----------------------------
-	WORD		wVersionRequested;
-	WSADATA		wsaData;
+  // Init the WinSock Library:
+  // ----------------------------
+  WORD wVersionRequested;
+  WSADATA wsaData;
 
-	wVersionRequested = MAKEWORD( 2, 0 );
+  wVersionRequested = MAKEWORD(2, 0);
 
-	if ( 0 != WSAStartup( wVersionRequested, &wsaData ) )
-		THROW_EXCEPTION( getLastErrorStr() );
+  if (0 != WSAStartup(wVersionRequested, &wsaData))
+    THROW_EXCEPTION(getLastErrorStr());
 
-	// Create the socket and put it listening:
-	setupSocket( listenPort, IPaddress, maxConnectionsWaiting );
+  // Create the socket and put it listening:
+  setupSocket(listenPort, IPaddress, maxConnectionsWaiting);
 
-	MRPT_END
+  MRPT_END
 }
 
 /*---------------------------------------------------------------
-					Destructor
+                                        Destructor
  ---------------------------------------------------------------*/
-CServerTCPSocket::~CServerTCPSocket( )
-{
-	// Delete socket:
-	if (m_serverSock != INVALID_SOCKET)
-		closesocket( m_serverSock );
+CServerTCPSocket::~CServerTCPSocket() {
+  // Delete socket:
+  if (m_serverSock != INVALID_SOCKET)
+    closesocket(m_serverSock);
 
-	WSACleanup();
+  WSACleanup();
 }
 
-
-#endif  // MRPT_OS_WINDOWS
+#endif // MRPT_OS_WINDOWS

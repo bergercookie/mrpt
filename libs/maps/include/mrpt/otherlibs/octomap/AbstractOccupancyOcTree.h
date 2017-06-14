@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_ABSTRACT_OCCUPANCY_OCTREE_H
 #define OCTOMAP_ABSTRACT_OCCUPANCY_OCTREE_H
 
@@ -14,7 +15,8 @@
 /**
 * OctoMap:
 * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
-* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011.
+* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+* 2009-2011.
 * @see http://octomap.sourceforge.net/
 * License: New BSD License
 */
@@ -49,207 +51,240 @@
  */
 
 #include "AbstractOcTree.h"
-#include "octomap_utils.h"
-#include "OcTreeNode.h"
 #include "OcTreeKey.h"
+#include "OcTreeNode.h"
+#include "octomap_utils.h"
 #include <cassert>
 #include <fstream>
 
-
 namespace octomap {
 
+/**
+ * Interface class for all octree types that store occupancy. This serves
+ * as a common base class e.g. for polymorphism and contains common code
+ * for reading and writing binary trees.
+ */
+class AbstractOccupancyOcTree : public AbstractOcTree {
+public:
+  AbstractOccupancyOcTree();
+  virtual ~AbstractOccupancyOcTree(){};
+
+  //-- IO
+
   /**
-   * Interface class for all octree types that store occupancy. This serves
-   * as a common base class e.g. for polymorphism and contains common code
-   * for reading and writing binary trees.
+   * Writes OcTree to a binary file using writeBinary().
+   * The OcTree is first converted to the maximum likelihood estimate and
+   * pruned.
+   * @return success of operation
    */
-  class AbstractOccupancyOcTree : public AbstractOcTree {
-  public:
-    AbstractOccupancyOcTree();
-    virtual ~AbstractOccupancyOcTree() {};
+  bool writeBinary(const std::string &filename);
 
-    //-- IO
+  /**
+   * Writes compressed maximum likelihood OcTree to a binary stream.
+   * The OcTree is first converted to the maximum likelihood estimate and pruned
+   * for maximum compression.
+   * @return success of operation
+   */
+  bool writeBinary(std::ostream &s);
 
-    /**
-     * Writes OcTree to a binary file using writeBinary().
-     * The OcTree is first converted to the maximum likelihood estimate and pruned.
-     * @return success of operation
-     */
-    bool writeBinary(const std::string& filename);
+  /**
+   * Writes OcTree to a binary file using writeBinaryConst().
+   * The OcTree is not changed, in particular not pruned first.
+   * Files will be smaller when the tree is pruned first or by using
+   * writeBinary() instead.
+   * @return success of operation
+   */
+  bool writeBinaryConst(const std::string &filename) const;
 
-    /**
-     * Writes compressed maximum likelihood OcTree to a binary stream.
-     * The OcTree is first converted to the maximum likelihood estimate and pruned
-     * for maximum compression.
-     * @return success of operation
-     */
-    bool writeBinary(std::ostream &s);
+  /**
+   * Writes the maximum likelihood OcTree to a binary stream (const variant).
+   * Files will be smaller when the tree is pruned first or by using
+   * writeBinary() instead.
+   * @return success of operation
+   */
+  bool writeBinaryConst(std::ostream &s) const;
 
-    /**
-     * Writes OcTree to a binary file using writeBinaryConst().
-     * The OcTree is not changed, in particular not pruned first.
-     * Files will be smaller when the tree is pruned first or by using
-     * writeBinary() instead.
-     * @return success of operation
-     */
-    bool writeBinaryConst(const std::string& filename) const;
+  /// Writes the actual data, implemented in
+  /// OccupancyOcTreeBase::writeBinaryData()
+  virtual std::ostream &writeBinaryData(std::ostream &s) const = 0;
 
-    /**
-     * Writes the maximum likelihood OcTree to a binary stream (const variant).
-     * Files will be smaller when the tree is pruned first or by using
-     * writeBinary() instead.
-     * @return success of operation
-     */
-    bool writeBinaryConst(std::ostream &s) const;
+  /**
+   * Reads an OcTree from an input stream.
+   * Existing nodes of the tree are deleted before the tree is read.
+   * @return success of operation
+   */
+  bool readBinary(std::istream &s);
 
-    /// Writes the actual data, implemented in OccupancyOcTreeBase::writeBinaryData()
-    virtual std::ostream& writeBinaryData(std::ostream &s) const = 0;
+  /**
+   * Reads OcTree from a binary file.
+   * Existing nodes of the tree are deleted before the tree is read.
+   * @return success of operation
+   */
+  bool readBinary(const std::string &filename);
 
-    /**
-     * Reads an OcTree from an input stream.
-     * Existing nodes of the tree are deleted before the tree is read.
-     * @return success of operation
-     */
-    bool readBinary(std::istream &s);
+  /// Reads the actual data, implemented in
+  /// OccupancyOcTreeBase::readBinaryData()
+  virtual std::istream &readBinaryData(std::istream &s) = 0;
 
-    /**
-     * Reads OcTree from a binary file.
-     * Existing nodes of the tree are deleted before the tree is read.
-     * @return success of operation
-     */
-    bool readBinary(const std::string& filename);
+  // -- occupancy queries
 
-    /// Reads the actual data, implemented in OccupancyOcTreeBase::readBinaryData()
-    virtual std::istream& readBinaryData(std::istream &s) = 0;
+  /// queries whether a node is occupied according to the tree's parameter for
+  /// "occupancy"
+  inline bool isNodeOccupied(const OcTreeNode *occupancyNode) const {
+    return (occupancyNode->getLogOdds() >= this->occ_prob_thres_log);
+  }
 
-    // -- occupancy queries
+  /// queries whether a node is occupied according to the tree's parameter for
+  /// "occupancy"
+  inline bool isNodeOccupied(const OcTreeNode &occupancyNode) const {
+    return (occupancyNode.getLogOdds() >= this->occ_prob_thres_log);
+  }
 
-    /// queries whether a node is occupied according to the tree's parameter for "occupancy"
-    inline bool isNodeOccupied(const OcTreeNode* occupancyNode) const{
-      return (occupancyNode->getLogOdds() >= this->occ_prob_thres_log);
-    }
+  /// queries whether a node is at the clamping threshold according to the
+  /// tree's parameter
+  inline bool isNodeAtThreshold(const OcTreeNode *occupancyNode) const {
+    return (occupancyNode->getLogOdds() >= this->clamping_thres_max ||
+            occupancyNode->getLogOdds() <= this->clamping_thres_min);
+  }
 
-    /// queries whether a node is occupied according to the tree's parameter for "occupancy"
-    inline bool isNodeOccupied(const OcTreeNode& occupancyNode) const{
-      return (occupancyNode.getLogOdds() >= this->occ_prob_thres_log);
-    }
+  /// queries whether a node is at the clamping threshold according to the
+  /// tree's parameter
+  inline bool isNodeAtThreshold(const OcTreeNode &occupancyNode) const {
+    return (occupancyNode.getLogOdds() >= this->clamping_thres_max ||
+            occupancyNode.getLogOdds() <= this->clamping_thres_min);
+  }
 
-    /// queries whether a node is at the clamping threshold according to the tree's parameter
-    inline bool isNodeAtThreshold(const OcTreeNode* occupancyNode) const{
-      return (occupancyNode->getLogOdds() >= this->clamping_thres_max
-          || occupancyNode->getLogOdds() <= this->clamping_thres_min);
-    }
+  // - update functions
 
-    /// queries whether a node is at the clamping threshold according to the tree's parameter
-    inline bool isNodeAtThreshold(const OcTreeNode& occupancyNode) const{
-      return (occupancyNode.getLogOdds() >= this->clamping_thres_max
-          || occupancyNode.getLogOdds() <= this->clamping_thres_min);
-    }
+  /**
+   * Manipulate log_odds value of voxel directly
+   *
+   * @param key of the NODE that is to be updated
+   * @param log_odds_update value to be added (+) to log_odds value of node
+   * @param lazy_eval whether update of inner nodes is omitted after the update
+   * (default: false).
+   *   This speeds up the insertion, but you need to call updateInnerOccupancy()
+   * when done.
+   * @return pointer to the updated NODE
+   */
+  virtual OcTreeNode *updateNode(const OcTreeKey &key, float log_odds_update,
+                                 bool lazy_eval = false) = 0;
 
-    // - update functions
+  /**
+   * Manipulate log_odds value of voxel directly.
+   * Looks up the OcTreeKey corresponding to the coordinate and then calls
+   * udpateNode() with it.
+   *
+   * @param value 3d coordinate of the NODE that is to be updated
+   * @param log_odds_update value to be added (+) to log_odds value of node
+   * @param lazy_eval whether update of inner nodes is omitted after the update
+   * (default: false).
+   *   This speeds up the insertion, but you need to call updateInnerOccupancy()
+   * when done.
+   * @return pointer to the updated NODE
+   */
+  virtual OcTreeNode *updateNode(const point3d &value, float log_odds_update,
+                                 bool lazy_eval = false) = 0;
 
-    /**
-     * Manipulate log_odds value of voxel directly
-     *
-     * @param key of the NODE that is to be updated
-     * @param log_odds_update value to be added (+) to log_odds value of node
-     * @param lazy_eval whether update of inner nodes is omitted after the update (default: false).
-     *   This speeds up the insertion, but you need to call updateInnerOccupancy() when done.
-     * @return pointer to the updated NODE
-     */
-    virtual OcTreeNode* updateNode(const OcTreeKey& key, float log_odds_update, bool lazy_eval = false) = 0;
+  /**
+   * Integrate occupancy measurement.
+   *
+   * @param key of the NODE that is to be updated
+   * @param occupied true if the node was measured occupied, else false
+   * @param lazy_eval whether update of inner nodes is omitted after the update
+   * (default: false).
+   *   This speeds up the insertion, but you need to call updateInnerOccupancy()
+   * when done.
+   * @return pointer to the updated NODE
+   */
+  virtual OcTreeNode *updateNode(const OcTreeKey &key, bool occupied,
+                                 bool lazy_eval = false) = 0;
 
-    /**
-     * Manipulate log_odds value of voxel directly.
-     * Looks up the OcTreeKey corresponding to the coordinate and then calls udpateNode() with it.
-     *
-     * @param value 3d coordinate of the NODE that is to be updated
-     * @param log_odds_update value to be added (+) to log_odds value of node
-     * @param lazy_eval whether update of inner nodes is omitted after the update (default: false).
-     *   This speeds up the insertion, but you need to call updateInnerOccupancy() when done.
-     * @return pointer to the updated NODE
-     */
-    virtual OcTreeNode* updateNode(const point3d& value, float log_odds_update, bool lazy_eval = false) = 0;
+  /**
+   * Integrate occupancy measurement.
+   * Looks up the OcTreeKey corresponding to the coordinate and then calls
+   * udpateNode() with it.
+   *
+   * @param value 3d coordinate of the NODE that is to be updated
+   * @param occupied true if the node was measured occupied, else false
+   * @param lazy_eval whether update of inner nodes is omitted after the update
+   * (default: false).
+   *   This speeds up the insertion, but you need to call updateInnerOccupancy()
+   * when done.
+   * @return pointer to the updated NODE
+   */
+  virtual OcTreeNode *updateNode(const point3d &value, bool occupied,
+                                 bool lazy_eval = false) = 0;
 
-    /**
-     * Integrate occupancy measurement.
-     *
-     * @param key of the NODE that is to be updated
-     * @param occupied true if the node was measured occupied, else false
-     * @param lazy_eval whether update of inner nodes is omitted after the update (default: false).
-     *   This speeds up the insertion, but you need to call updateInnerOccupancy() when done.
-     * @return pointer to the updated NODE
-     */
-    virtual OcTreeNode* updateNode(const OcTreeKey& key, bool occupied, bool lazy_eval = false) = 0;
+  virtual void toMaxLikelihood() = 0;
 
-    /**
-     * Integrate occupancy measurement.
-     * Looks up the OcTreeKey corresponding to the coordinate and then calls udpateNode() with it.
-     *
-     * @param value 3d coordinate of the NODE that is to be updated
-     * @param occupied true if the node was measured occupied, else false
-     * @param lazy_eval whether update of inner nodes is omitted after the update (default: false).
-     *   This speeds up the insertion, but you need to call updateInnerOccupancy() when done.
-     * @return pointer to the updated NODE
-     */
-    virtual OcTreeNode* updateNode(const point3d& value, bool occupied, bool lazy_eval = false) = 0;
+  //-- parameters for occupancy and sensor model:
 
-    virtual void toMaxLikelihood() = 0;
+  /// sets the threshold for occupancy (sensor model)
+  void setOccupancyThres(double prob) { occ_prob_thres_log = logodds(prob); }
+  /// sets the probablility for a "hit" (will be converted to logodds) - sensor
+  /// model
+  void setProbHit(double prob) {
+    prob_hit_log = logodds(prob);
+    assert(prob_hit_log >= 0.0);
+  }
+  /// sets the probablility for a "miss" (will be converted to logodds) - sensor
+  /// model
+  void setProbMiss(double prob) {
+    prob_miss_log = logodds(prob);
+    assert(prob_miss_log <= 0.0);
+  }
+  /// sets the minimum threshold for occupancy clamping (sensor model)
+  void setClampingThresMin(double thresProb) {
+    clamping_thres_min = logodds(thresProb);
+  }
+  /// sets the maximum threshold for occupancy clamping (sensor model)
+  void setClampingThresMax(double thresProb) {
+    clamping_thres_max = logodds(thresProb);
+  }
 
-    //-- parameters for occupancy and sensor model:
+  /// @return threshold (probability) for occupancy - sensor model
+  double getOccupancyThres() const { return probability(occ_prob_thres_log); }
+  /// @return threshold (logodds) for occupancy - sensor model
+  float getOccupancyThresLog() const { return occ_prob_thres_log; }
 
-    /// sets the threshold for occupancy (sensor model)
-    void setOccupancyThres(double prob){occ_prob_thres_log = logodds(prob); }
-    /// sets the probablility for a "hit" (will be converted to logodds) - sensor model
-    void setProbHit(double prob){prob_hit_log = logodds(prob); assert(prob_hit_log >= 0.0);}
-    /// sets the probablility for a "miss" (will be converted to logodds) - sensor model
-    void setProbMiss(double prob){prob_miss_log = logodds(prob); assert(prob_miss_log <= 0.0);}
-    /// sets the minimum threshold for occupancy clamping (sensor model)
-    void setClampingThresMin(double thresProb){clamping_thres_min = logodds(thresProb); }
-    /// sets the maximum threshold for occupancy clamping (sensor model)
-    void setClampingThresMax(double thresProb){clamping_thres_max = logodds(thresProb); }
+  /// @return probablility for a "hit" in the sensor model (probability)
+  double getProbHit() const { return probability(prob_hit_log); }
+  /// @return probablility for a "hit" in the sensor model (logodds)
+  float getProbHitLog() const { return prob_hit_log; }
+  /// @return probablility for a "miss"  in the sensor model (probability)
+  double getProbMiss() const { return probability(prob_miss_log); }
+  /// @return probablility for a "miss"  in the sensor model (logodds)
+  float getProbMissLog() const { return prob_miss_log; }
 
-    /// @return threshold (probability) for occupancy - sensor model
-    double getOccupancyThres() const {return probability(occ_prob_thres_log); }
-    /// @return threshold (logodds) for occupancy - sensor model
-    float getOccupancyThresLog() const {return occ_prob_thres_log; }
+  /// @return minimum threshold for occupancy clamping in the sensor model
+  /// (probability)
+  double getClampingThresMin() const { return probability(clamping_thres_min); }
+  /// @return minimum threshold for occupancy clamping in the sensor model
+  /// (logodds)
+  float getClampingThresMinLog() const { return clamping_thres_min; }
+  /// @return maximum threshold for occupancy clamping in the sensor model
+  /// (probability)
+  double getClampingThresMax() const { return probability(clamping_thres_max); }
+  /// @return maximum threshold for occupancy clamping in the sensor model
+  /// (logodds)
+  float getClampingThresMaxLog() const { return clamping_thres_max; }
 
-    /// @return probablility for a "hit" in the sensor model (probability)
-    double getProbHit() const {return probability(prob_hit_log); }
-    /// @return probablility for a "hit" in the sensor model (logodds)
-    float getProbHitLog() const {return prob_hit_log; }
-    /// @return probablility for a "miss"  in the sensor model (probability)
-    double getProbMiss() const {return probability(prob_miss_log); }
-    /// @return probablility for a "miss"  in the sensor model (logodds)
-    float getProbMissLog() const {return prob_miss_log; }
+protected:
+  /// Try to read the old binary format for conversion, will be removed in the
+  /// future
+  bool readBinaryLegacyHeader(std::istream &s, unsigned int &size, double &res);
 
-    /// @return minimum threshold for occupancy clamping in the sensor model (probability)
-    double getClampingThresMin() const {return probability(clamping_thres_min); }
-    /// @return minimum threshold for occupancy clamping in the sensor model (logodds)
-    float getClampingThresMinLog() const {return clamping_thres_min; }
-    /// @return maximum threshold for occupancy clamping in the sensor model (probability)
-    double getClampingThresMax() const {return probability(clamping_thres_max); }
-    /// @return maximum threshold for occupancy clamping in the sensor model (logodds)
-    float getClampingThresMaxLog() const {return clamping_thres_max; }
+  // occupancy parameters of tree, stored in logodds:
+  float clamping_thres_min;
+  float clamping_thres_max;
+  float prob_hit_log;
+  float prob_miss_log;
+  float occ_prob_thres_log;
 
-
-
-
-  protected:
-    /// Try to read the old binary format for conversion, will be removed in the future
-    bool readBinaryLegacyHeader(std::istream &s, unsigned int& size, double& res);
-
-    // occupancy parameters of tree, stored in logodds:
-    float clamping_thres_min;
-    float clamping_thres_max;
-    float prob_hit_log;
-    float prob_miss_log;
-    float occ_prob_thres_log;
-
-    static const std::string binaryFileHeader;
-  };
+  static const std::string binaryFileHeader;
+};
 
 } // end namespace
-
 
 #endif

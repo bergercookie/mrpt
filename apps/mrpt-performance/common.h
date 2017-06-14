@@ -5,15 +5,16 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef MRPTPERFAPP_COMMON_H
 #define MRPTPERFAPP_COMMON_H
 
+#include <functional>
+#include <list>
 #include <mrpt/utils/CImage.h>
 #include <mrpt/utils/CTicTac.h>
-#include <list>
-#include <functional>
 
 // All the register functions: --------------------
 void register_tests_icpslam();
@@ -35,26 +36,24 @@ void register_tests_atan2lut();
 void register_tests_strings();
 // -------------------------------------------------
 
-using TestFunctor = std::function<double(int,int)>; // return run-time in secs.
+using TestFunctor = std::function<double(int, int)>; // return run-time in secs.
 
-struct TestData
-{
-	TestData(const char*nam,TestFunctor f,int a1=0,int a2=0) : name(nam),func(f),arg1(a1),arg2(a2) { }
+struct TestData {
+  TestData(const char *nam, TestFunctor f, int a1 = 0, int a2 = 0)
+      : name(nam), func(f), arg1(a1), arg2(a2) {}
 
-	const char *name;
-	TestFunctor func;
-	int arg1,arg2;
+  const char *name;
+  TestFunctor func;
+  int arg1, arg2;
 };
 
 // Common data & functions available to all performance modules:
 extern std::list<TestData> lstTests;
 
 extern const float SCAN_RANGES_1[361];
-extern const char  SCAN_VALID_1[361];
-
+extern const char SCAN_VALID_1[361];
 
 void dummy_do_nothing_with_string(const std::string &s);
-void getTestImage(unsigned int img_index, mrpt::utils::CImage &out_img );
-
+void getTestImage(unsigned int img_index, mrpt::utils::CImage &out_img);
 
 #endif

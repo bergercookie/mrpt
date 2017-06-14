@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_BASE_H
 #define OCTOMAP_OCTREE_BASE_H
 
@@ -14,7 +15,8 @@
 /**
 * OctoMap:
 * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
-* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011.
+* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+* 2009-2011.
 * @see http://octomap.sourceforge.net/
 * License: New BSD License
 */
@@ -48,23 +50,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OcTreeBaseImpl.h"
 #include "AbstractOcTree.h"
-
+#include "OcTreeBaseImpl.h"
 
 namespace octomap {
-  template <class NODE>
-  class OcTreeBase : public OcTreeBaseImpl<NODE,AbstractOcTree> {
-  public:
-    OcTreeBase<NODE>(double res) : OcTreeBaseImpl<NODE,AbstractOcTree>(res) {};
+template <class NODE>
+class OcTreeBase : public OcTreeBaseImpl<NODE, AbstractOcTree> {
+public:
+  OcTreeBase<NODE>(double res) : OcTreeBaseImpl<NODE, AbstractOcTree>(res){};
 
-    /// virtual constructor: creates a new object of same type
-    /// (Covariant return type requires an up-to-date compiler)
-    OcTreeBase<NODE>* create() const {return new OcTreeBase<NODE>(this->resolution); }
-    std::string getTreeType() const {return "OcTreeBase";}
-  };
-
+  /// virtual constructor: creates a new object of same type
+  /// (Covariant return type requires an up-to-date compiler)
+  OcTreeBase<NODE> *create() const {
+    return new OcTreeBase<NODE>(this->resolution);
   }
-
+  std::string getTreeType() const { return "OcTreeBase"; }
+};
+}
 
 #endif

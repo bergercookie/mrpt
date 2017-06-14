@@ -5,13 +5,14 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #include <mrpt/hwdrivers/CBoardENoses.h>
-#include <mrpt/utils/CConfigFile.h>
 #include <mrpt/obs/CObservationGasSensors.h>
-#include <mrpt/system/os.h>
 #include <mrpt/system/filesystem.h>
+#include <mrpt/system/os.h>
+#include <mrpt/utils/CConfigFile.h>
 
 #include <thread>
 
@@ -22,104 +23,104 @@ using namespace mrpt::obs;
 using namespace mrpt::utils;
 using namespace std;
 
-int main()
-{
-	try
-	{
-		CBoardENoses			eNoses;
-		std::string				firmVers;
-		CObservationGasSensors	obs;
-		FILE					*f_log = os::fopen("./log.txt","wt");
-		TTimeStamp				timStart = mrpt::system::getCurrentTime();
+int main() {
+  try {
+    CBoardENoses eNoses;
+    std::string firmVers;
+    CObservationGasSensors obs;
+    FILE *f_log = os::fopen("./log.txt", "wt");
+    TTimeStamp timStart = mrpt::system::getCurrentTime();
 
+    // Load configuration:
+    if (mrpt::system::fileExists("./CONFIG_eNoses.ini")) {
+      cout << "Using configuration from './CONFIG_eNoses.ini'" << endl;
+      CConfigFile conf("./CONFIG_eNoses.ini");
+      eNoses.loadConfig(conf, "eNoses");
+    } else {
+      cout << "Configuration file (ini) cannot be found" << endl;
+      return -1;
+    }
 
-		// Load configuration:
-		if (mrpt::system::fileExists("./CONFIG_eNoses.ini"))
-		{
-			cout << "Using configuration from './CONFIG_eNoses.ini'" << endl;
-			CConfigFile		conf("./CONFIG_eNoses.ini");
-			eNoses.loadConfig( conf, "eNoses" );
-		}
-		else
-		{
-			cout << "Configuration file (ini) cannot be found" << endl;
-			return -1;
-		}
+    ASSERT_(mrpt::system::fileExists("CONFIG_eNoses.ini"));
+    CConfigFile conf("./CONFIG_eNoses.ini");
+    eNoses.loadConfig(conf, "eNoses");
 
-		ASSERT_( mrpt::system::fileExists("CONFIG_eNoses.ini") );
-		CConfigFile conf("./CONFIG_eNoses.ini");
-		eNoses.loadConfig( conf, "eNoses" );
+    /*if (!eNoses.queryFirmwareVersion( firmVers ) )
+    {
+            printf("Error!!\n");
+            return -1;
+    }
+    else
+            std::cout << "FIRMWARE VERSION: " << firmVers << std::endl;
+    */
 
+    while (!mrpt::system::os::kbhit()) {
+      if (!eNoses.getObservation(obs)) {
+        cout << "- Could not retrieve an observation from the eNoses..."
+             << endl;
+        std::this_thread::sleep_for(25ms);
+      } else {
 
-		/*if (!eNoses.queryFirmwareVersion( firmVers ) )
-		{
-			printf("Error!!\n");
-			return -1;
-		}
-		else
-			std::cout << "FIRMWARE VERSION: " << firmVers << std::endl;
-		*/
+        cout << obs.m_readings.size() << " eNoses:" << endl;
 
-		while ( !mrpt::system::os::kbhit() )
-		{
-			if (! eNoses.getObservation( obs ) )
-			{
-				cout << "- Could not retrieve an observation from the eNoses..." << endl;
-				std::this_thread::sleep_for(25ms);
-			}
-			else
-			{
+        if (f_log)
+          fprintf(f_log, "%f ",
+                  mrpt::system::timeDifference(timStart, obs.timestamp));
 
-				cout << obs.m_readings.size() << " eNoses:" << endl;
+        for (size_t i = 0; i < obs.m_readings.size(); i++) {
+          // E-Nose Pose
+          printf("#%u (%.02f,%.02f,%.02f): ", (unsigned int)i,
+                 obs.m_readings[i].eNosePoseOnTheRobot.x,
+                 obs.m_readings[i].eNosePoseOnTheRobot.y,
+                 obs.m_readings[i].eNosePoseOnTheRobot.z);
 
-				if (f_log) fprintf(f_log,"%f ", mrpt::system::timeDifference(timStart,obs.timestamp) );
+          // E-Nose Sensor's Data
+          for (size_t j = 0; j < obs.m_readings[i].sensorTypes.size(); j++) {
+            // printf("%04X: %.03fV ", obs.m_readings[i].sensorTypes[j],
+            // obs.m_readings[i].readingsVoltage[j] );
 
-				for (size_t i=0;i<obs.m_readings.size();i++)
-				{
-					//E-Nose Pose
-					printf("#%u (%.02f,%.02f,%.02f): ",(unsigned int)i,obs.m_readings[i].eNosePoseOnTheRobot.x,obs.m_readings[i].eNosePoseOnTheRobot.y,obs.m_readings[i].eNosePoseOnTheRobot.z);
+            if (j < (obs.m_readings[i].sensorTypes.size() - 1)) {
+              if (obs.m_readings[i].sensorTypes[j] ==
+                  obs.m_readings[i].sensorTypes[j + 1]) {
+                printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j],
+                       obs.m_readings[i].readingsVoltage[j] -
+                           obs.m_readings[i].readingsVoltage[j + 1]);
+                j++; // skip the next sensor as it has been used already.
+              } else {
+                printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j],
+                       obs.m_readings[i].readingsVoltage[j]);
+              }
+            } else {
+              printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j],
+                     obs.m_readings[i].readingsVoltage[j]);
+            }
 
-					//E-Nose Sensor's Data
-					for (size_t j=0;j<obs.m_readings[i].sensorTypes.size();j++)
-					{
-						//printf("%04X: %.03fV ", obs.m_readings[i].sensorTypes[j], obs.m_readings[i].readingsVoltage[j] );
+            if (f_log)
+              fprintf(f_log, "%f ", obs.m_readings[i].readingsVoltage[j]);
+          }
 
-						if ( j<(obs.m_readings[i].sensorTypes.size()-1) ){
-							if( obs.m_readings[i].sensorTypes[j]==obs.m_readings[i].sensorTypes[j+1] ){
-								printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j], obs.m_readings[i].readingsVoltage[j]-obs.m_readings[i].readingsVoltage[j+1] );
-								j++;	//skip the next sensor as it has been used already.
-							}else{
-								printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j], obs.m_readings[i].readingsVoltage[j] );
-							}
-						}else{
-								printf("\n%04X: %.03fV \n ", obs.m_readings[i].sensorTypes[j], obs.m_readings[i].readingsVoltage[j] );
-						}
+          printf("\nTemp: ");
+          if (obs.m_readings[i].hasTemperature)
+            printf("%.04f C", obs.m_readings[i].temperature);
+          else
+            printf("NO");
 
-						if (f_log) fprintf(f_log,"%f ",obs.m_readings[i].readingsVoltage[j]);
-					}
+          printf("\n");
+          printf("-----------------------------------------\n");
+        }
+        if (f_log)
+          fprintf(f_log, "\n");
 
-					printf("\nTemp: ");
-					if (obs.m_readings[i].hasTemperature)
-							printf("%.04f C",obs.m_readings[i].temperature);
-					else	printf("NO");
+        std::this_thread::sleep_for(5ms);
+      }
+    }
 
-					printf("\n");
-					printf("-----------------------------------------\n");
-				}
-				if (f_log) fprintf(f_log,"\n");
+    if (f_log)
+      os::fclose(f_log);
+  } catch (std::exception &e) {
+    cerr << e.what() << endl;
+    return -1;
+  }
 
-				std::this_thread::sleep_for(5ms);
-			}
-
-		}
-
-		if (f_log) os::fclose(f_log);
-	}
-	catch(std::exception &e)
-	{
-		cerr << e.what() << endl;
-		return -1;
-	}
-
-	return 0;
+  return 0;
 }

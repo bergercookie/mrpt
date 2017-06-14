@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_STAMPED_H
 #define OCTOMAP_OCTREE_STAMPED_H
 
@@ -13,8 +14,10 @@
 
 /**
  * OctoMap:
- * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
- * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011
+ * A probabilistic, flexible, and compact 3D mapping library for robotic
+ * systems.
+ * @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+ * 2009-2011
  * @see http://octomap.sourceforge.net/
  * License: New BSD License
  */
@@ -48,91 +51,95 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ctime>
 #include <mrpt/otherlibs/octomap/OcTreeNode.h>
 #include <mrpt/otherlibs/octomap/OccupancyOcTreeBase.h>
-#include <ctime>
 
 namespace octomap {
-  
-  // node definition
-  class OcTreeNodeStamped : public OcTreeNode {    
 
+// node definition
+class OcTreeNodeStamped : public OcTreeNode {
+
+public:
+  OcTreeNodeStamped() : OcTreeNode(), timestamp(0) {}
+
+  OcTreeNodeStamped(const OcTreeNodeStamped &rhs)
+      : OcTreeNode(rhs), timestamp(rhs.timestamp) {}
+
+  bool operator==(const OcTreeNodeStamped &rhs) const {
+    return (rhs.value == value && rhs.timestamp == timestamp);
+  }
+
+  // children
+  inline OcTreeNodeStamped *getChild(unsigned int i) {
+    return static_cast<OcTreeNodeStamped *>(OcTreeNode::getChild(i));
+  }
+  inline const OcTreeNodeStamped *getChild(unsigned int i) const {
+    return static_cast<const OcTreeNodeStamped *>(OcTreeNode::getChild(i));
+  }
+
+  bool createChild(unsigned int i) {
+    if (children == nullptr)
+      allocChildren();
+    children[i] = new OcTreeNodeStamped();
+    return true;
+  }
+
+  // timestamp
+  inline unsigned int getTimestamp() const { return timestamp; }
+  inline void updateTimestamp() { timestamp = (unsigned int)time(nullptr); }
+  inline void setTimestamp(unsigned int timestamp) {
+    this->timestamp = timestamp;
+  }
+
+  // update occupancy and timesteps of inner nodes
+  inline void updateOccupancyChildren() {
+    this->setLogOdds(this->getMaxChildLogOdds()); // conservative
+    updateTimestamp();
+  }
+
+protected:
+  unsigned int timestamp;
+};
+
+// tree definition
+class OcTreeStamped : public OccupancyOcTreeBase<OcTreeNodeStamped> {
+
+public:
+  /// Default constructor, sets resolution of leafs
+  OcTreeStamped(double resolution)
+      : OccupancyOcTreeBase<OcTreeNodeStamped>(resolution){};
+
+  /// virtual constructor: creates a new object of same type
+  /// (Covariant return type requires an up-to-date compiler)
+  OcTreeStamped *create() const { return new OcTreeStamped(resolution); }
+
+  std::string getTreeType() const { return "OcTreeStamped"; }
+
+  //! \return timestamp of last update
+  unsigned int getLastUpdateTime();
+
+  void degradeOutdatedNodes(unsigned int time_thres);
+
+  virtual void updateNodeLogOdds(OcTreeNodeStamped *node,
+                                 const float &update) const;
+  void integrateMissNoTime(OcTreeNodeStamped *node) const;
+
+protected:
+  /**
+   * Static member object which ensures that this OcTree's prototype
+   * ends up in the classIDMapping only once
+   */
+  class StaticMemberInitializer {
   public:
-    OcTreeNodeStamped() : OcTreeNode(), timestamp(0) {}
-
-    OcTreeNodeStamped(const OcTreeNodeStamped& rhs) : OcTreeNode(rhs), timestamp(rhs.timestamp) {}
-
-    bool operator==(const OcTreeNodeStamped& rhs) const{
-      return (rhs.value == value && rhs.timestamp == timestamp);
+    StaticMemberInitializer() {
+      OcTreeStamped *tree = new OcTreeStamped(0.1);
+      AbstractOcTree::registerTreeType(tree);
     }
-    
-    // children
-    inline OcTreeNodeStamped* getChild(unsigned int i) {
-      return static_cast<OcTreeNodeStamped*> (OcTreeNode::getChild(i));
-    }
-    inline const OcTreeNodeStamped* getChild(unsigned int i) const {
-      return static_cast<const OcTreeNodeStamped*> (OcTreeNode::getChild(i));
-    }
-
-    bool createChild(unsigned int i) {
-      if (children == nullptr) allocChildren();
-      children[i] = new OcTreeNodeStamped();
-      return true;
-    }
-    
-    // timestamp
-    inline unsigned int getTimestamp() const { return timestamp; }
-    inline void updateTimestamp() { timestamp = (unsigned int) time(nullptr);}
-    inline void setTimestamp(unsigned int timestamp) {this->timestamp = timestamp; }
-
-    // update occupancy and timesteps of inner nodes 
-    inline void updateOccupancyChildren() {      
-      this->setLogOdds(this->getMaxChildLogOdds());  // conservative
-      updateTimestamp();
-    }
-
-  protected:
-    unsigned int timestamp;
   };
-
-
-  // tree definition
-  class OcTreeStamped : public OccupancyOcTreeBase <OcTreeNodeStamped> {    
-
-  public:
-    /// Default constructor, sets resolution of leafs
-    OcTreeStamped(double resolution) : OccupancyOcTreeBase<OcTreeNodeStamped>(resolution) {};    
-      
-    /// virtual constructor: creates a new object of same type
-    /// (Covariant return type requires an up-to-date compiler)
-    OcTreeStamped* create() const {return new OcTreeStamped(resolution); }
-
-    std::string getTreeType() const {return "OcTreeStamped";}
-
-    //! \return timestamp of last update
-    unsigned int getLastUpdateTime();
-
-    void degradeOutdatedNodes(unsigned int time_thres);
-    
-    virtual void updateNodeLogOdds(OcTreeNodeStamped* node, const float& update) const;
-    void integrateMissNoTime(OcTreeNodeStamped* node) const;
-
-  protected:
-    /**
-     * Static member object which ensures that this OcTree's prototype
-     * ends up in the classIDMapping only once
-     */
-    class StaticMemberInitializer{
-    public:
-      StaticMemberInitializer() {
-        OcTreeStamped* tree = new OcTreeStamped(0.1);
-        AbstractOcTree::registerTreeType(tree);
-      }
-    };
-    /// to ensure static initialization (only once)
-    static StaticMemberInitializer ocTreeStampedMemberInit;
-    
-  };
+  /// to ensure static initialization (only once)
+  static StaticMemberInitializer ocTreeStampedMemberInit;
+};
 
 } // end namespace
 

@@ -5,9 +5,10 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
-#ifndef  __FREEGLUT_H__
-#define  __FREEGLUT_H__
+   +---------------------------------------------------------------------------+
+   */
+#ifndef __FREEGLUT_H__
+#define __FREEGLUT_H__
 
 /*
  * freeglut.h
@@ -22,8 +23,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "freeglut_std.h"
 #include "freeglut_ext.h"
+#include "freeglut_std.h"
 
 /*** END OF FILE ***/
 

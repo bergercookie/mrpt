@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 // $Id: ScanGraph.h 245 2011-08-09 10:00:53Z kai_wurm $
 
 /**
@@ -48,199 +49,186 @@
 #ifndef OCTOMAP_SCANGRAPH_H
 #define OCTOMAP_SCANGRAPH_H
 
-
-#include <string>
 #include <math.h>
+#include <string>
 
 #include "Pointcloud.h"
 #include "octomap_types.h"
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 
 namespace octomap {
 
-  class ScanGraph;
+class ScanGraph;
 
+/**
+ * A 3D scan as Pointcloud, performed from a Pose6D.
+ */
+class /*MAPS_IMPEXP*/ ScanNode {
 
-  /**
-   * A 3D scan as Pointcloud, performed from a Pose6D.
-   */
-  class /*MAPS_IMPEXP*/ ScanNode {
-
-   public:
-
-    ScanNode (Pointcloud* _scan, pose6d _pose, uint64_t _id)
+public:
+  ScanNode(Pointcloud *_scan, pose6d _pose, uint64_t _id)
       : scan(_scan), pose(_pose), id(_id) {}
-    ScanNode ()
-      : scan(nullptr) {}
+  ScanNode() : scan(nullptr) {}
 
-    ~ScanNode();
+  ~ScanNode();
 
-    bool operator == (const ScanNode& other) {
-      return (id == other.id);
-    }
+  bool operator==(const ScanNode &other) { return (id == other.id); }
 
-    std::ostream& writeBinary(std::ostream &s) const;
-    std::istream& readBinary(std::istream &s);
+  std::ostream &writeBinary(std::ostream &s) const;
+  std::istream &readBinary(std::istream &s);
 
-    std::ostream& writePoseASCII(std::ostream &s) const;
-    std::istream& readPoseASCII(std::istream &s);
+  std::ostream &writePoseASCII(std::ostream &s) const;
+  std::istream &readPoseASCII(std::istream &s);
 
-    Pointcloud* scan;
-    pose6d pose; ///< 6D pose from which the scan was performed
-    uint64_t id;   //!< JLBC: Changed from "unsigned int" so binarized versions are platform-independent.
-	 
-  };
+  Pointcloud *scan;
+  pose6d pose; ///< 6D pose from which the scan was performed
+  uint64_t id; //!< JLBC: Changed from "unsigned int" so binarized versions are
+               //!platform-independent.
+};
+
+/**
+ * A connection between two \ref ScanNode "ScanNodes"
+ */
+class /*MAPS_IMPEXP*/ ScanEdge {
+
+public:
+  ScanEdge(ScanNode *_first, ScanNode *_second, pose6d _constraint)
+      : first(_first), second(_second), constraint(_constraint), weight(1.0) {}
+  ScanEdge() {}
+
+  bool operator==(const ScanEdge &other) {
+    return ((*first == *(other.first)) && (*second == *(other.second)));
+  }
+
+  std::ostream &writeBinary(std::ostream &s) const;
+  // a graph has to be given to recover ScanNode pointers
+  std::istream &readBinary(std::istream &s, ScanGraph &graph);
+
+  std::ostream &writeASCII(std::ostream &s) const;
+  std::istream &readASCII(std::istream &s, ScanGraph &graph);
+
+  ScanNode *first;
+  ScanNode *second;
+
+  pose6d constraint;
+  double weight;
+};
+
+/**
+ * A ScanGraph is a collection of ScanNodes, connected by ScanEdges.
+ * Each ScanNode contains a 3D scan performed from a pose.
+ *
+ */
+class /*MAPS_IMPEXP*/ ScanGraph {
+
+public:
+  ScanGraph(){};
+  ~ScanGraph();
+
+  /// Clears all nodes and edges, and will delete the corresponding objects
+  void clear();
 
   /**
-   * A connection between two \ref ScanNode "ScanNodes"
-   */
-  class /*MAPS_IMPEXP*/ ScanEdge {
-
-   public:
-
-    ScanEdge(ScanNode* _first, ScanNode* _second, pose6d _constraint)
-      : first(_first), second(_second), constraint(_constraint), weight(1.0) { }
-    ScanEdge() {}
-
-    bool operator == (const ScanEdge& other) {
-      return ( (*first == *(other.first) ) && ( *second == *(other.second) ) );
-    }
-
-    std::ostream& writeBinary(std::ostream &s) const;
-    // a graph has to be given to recover ScanNode pointers
-    std::istream& readBinary(std::istream &s, ScanGraph& graph);
-
-    std::ostream& writeASCII(std::ostream &s) const;
-    std::istream& readASCII(std::istream &s, ScanGraph& graph);
-
-    ScanNode* first;
-    ScanNode* second;
-
-    pose6d constraint;
-    double weight;
-  };
-
-
-  /**
-   * A ScanGraph is a collection of ScanNodes, connected by ScanEdges.
-   * Each ScanNode contains a 3D scan performed from a pose.
+   * Creates a new ScanNode in the graph from a Pointcloud.
    *
+   * @param scan Pointer to a pointcloud to be added to the ScanGraph.
+   *        ScanGraph will delete the object when it's no longer needed, don't
+   * delete it yourself.
+   * @param pose 6D pose of the origin of the Pointcloud
+   * @return Pointer to the new node
    */
-  class /*MAPS_IMPEXP*/ ScanGraph {
+  ScanNode *addNode(Pointcloud *scan, pose6d pose);
 
-   public:
+  /**
+   * Creates an edge between two ScanNodes.
+   * ScanGraph will delete the object when it's no longer needed, don't delete
+   * it yourself.
+   *
+   * @param first ScanNode
+   * @param second ScanNode
+   * @param constraint 6D transform between the two nodes
+   * @return
+   */
+  ScanEdge *addEdge(ScanNode *first, ScanNode *second, pose6d constraint);
 
-    ScanGraph() {};
-    ~ScanGraph();
+  ScanEdge *addEdge(uint64_t first_id, uint64_t second_id);
 
-    /// Clears all nodes and edges, and will delete the corresponding objects
-    void clear();
+  /// will return nullptr if node was not found
+  ScanNode *getNodeByID(uint64_t id);
 
-    /**
-     * Creates a new ScanNode in the graph from a Pointcloud.
-     *
-     * @param scan Pointer to a pointcloud to be added to the ScanGraph.
-     *        ScanGraph will delete the object when it's no longer needed, don't delete it yourself.
-     * @param pose 6D pose of the origin of the Pointcloud
-     * @return Pointer to the new node
-     */
-    ScanNode* addNode(Pointcloud* scan, pose6d pose);
+  /// \return true when an edge between first_id and second_id exists
+  bool edgeExists(uint64_t first_id, uint64_t second_id);
 
-    /**
-     * Creates an edge between two ScanNodes.
-     * ScanGraph will delete the object when it's no longer needed, don't delete it yourself.
-     *
-     * @param first ScanNode
-     * @param second ScanNode
-     * @param constraint 6D transform between the two nodes
-     * @return
-     */
-    ScanEdge* addEdge(ScanNode* first, ScanNode* second, pose6d constraint);
+  /// Connect previously added ScanNode to the one before that
+  void connectPrevious();
 
-    ScanEdge* addEdge(uint64_t first_id, uint64_t second_id);
+  std::vector<uint64_t> getNeighborIDs(uint64_t id);
+  std::vector<ScanEdge *> getOutEdges(ScanNode *node);
+  // warning: constraints are reversed
+  std::vector<ScanEdge *> getInEdges(ScanNode *node);
 
-    /// will return nullptr if node was not found
-    ScanNode* getNodeByID(uint64_t id);
+  void exportDot(std::string filename);
 
-    /// \return true when an edge between first_id and second_id exists
-    bool edgeExists(uint64_t first_id, uint64_t second_id);
+  /// Transform every scan according to its pose
+  void transformScans();
 
-    /// Connect previously added ScanNode to the one before that
-    void connectPrevious();
+  /// Cut graph (all containing Pointclouds) to given BBX in global coords
+  void crop(point3d lowerBound, point3d upperBound);
 
-    std::vector<uint64_t> getNeighborIDs(uint64_t id);
-    std::vector<ScanEdge*> getOutEdges(ScanNode* node);
-    // warning: constraints are reversed
-    std::vector<ScanEdge*> getInEdges(ScanNode* node);
+  /// Cut Pointclouds to given BBX in local coords
+  void cropEachScan(point3d lowerBound, point3d upperBound);
 
-    void exportDot(std::string filename);
+  typedef std::vector<ScanNode *>::iterator iterator;
+  typedef std::vector<ScanNode *>::const_iterator const_iterator;
+  iterator begin() { return nodes.begin(); }
+  iterator end() { return nodes.end(); }
+  const_iterator begin() const { return nodes.begin(); }
+  const_iterator end() const { return nodes.end(); }
 
-    /// Transform every scan according to its pose
-    void transformScans();
+  size_t size() const { return nodes.size(); }
+  size_t getNumPoints(uint64_t max_id = -1) const;
 
-    /// Cut graph (all containing Pointclouds) to given BBX in global coords
-    void crop(point3d lowerBound, point3d upperBound);
+  typedef std::vector<ScanEdge *>::iterator edge_iterator;
+  typedef std::vector<ScanEdge *>::const_iterator const_edge_iterator;
+  edge_iterator edges_begin() { return edges.begin(); }
+  edge_iterator edges_end() { return edges.end(); }
+  const_edge_iterator edges_begin() const { return edges.begin(); }
+  const_edge_iterator edges_end() const { return edges.end(); }
 
-    /// Cut Pointclouds to given BBX in local coords
-    void cropEachScan(point3d lowerBound, point3d upperBound);
+  std::ostream &writeBinary(std::ostream &s) const;
+  std::istream &readBinary(std::ifstream &s);
+  bool writeBinary(const std::string &filename) const;
+  bool readBinary(const std::string &filename);
 
+  std::ostream &writeEdgesASCII(std::ostream &s) const;
+  std::istream &readEdgesASCII(std::istream &s);
 
-    typedef std::vector<ScanNode*>::iterator iterator;
-    typedef std::vector<ScanNode*>::const_iterator const_iterator;
-    iterator begin() { return nodes.begin(); }
-    iterator end()   { return nodes.end(); }
-    const_iterator begin() const { return nodes.begin(); }
-    const_iterator end() const { return nodes.end(); }
+  std::ostream &writeNodePosesASCII(std::ostream &s) const;
+  std::istream &readNodePosesASCII(std::istream &s);
 
-    size_t size() const { return nodes.size(); }
-    size_t getNumPoints(uint64_t max_id = -1) const;
+  /**
+   * Reads in a ScanGraph from a "plain" ASCII file of the form
+   * NODE x y z R P Y
+   * x y z
+   * x y z
+   * x y z
+   * NODE x y z R P Y
+   * x y z
+   *
+   * Lines starting with the NODE keyword contain the 6D pose of a scan node,
+   * all 3D point following until the next NODE keyword (or end of file) are
+   * inserted into that scan node as pointcloud in its local coordinate frame
+   *
+   * @param input stream to read from
+   * @return read stream
+   */
+  std::istream &readPlainASCII(std::istream &s);
+  void readPlainASCII(const std::string &filename);
 
-    typedef std::vector<ScanEdge*>::iterator edge_iterator;
-    typedef std::vector<ScanEdge*>::const_iterator const_edge_iterator;
-    edge_iterator edges_begin() { return edges.begin(); }
-    edge_iterator edges_end()  { return edges.end(); }
-    const_edge_iterator edges_begin() const { return edges.begin(); }
-    const_edge_iterator edges_end() const  { return edges.end(); }
-
-
-    std::ostream& writeBinary(std::ostream &s) const;
-    std::istream& readBinary(std::ifstream &s);
-    bool writeBinary(const std::string& filename) const;
-    bool readBinary(const std::string& filename);
-
-
-    std::ostream& writeEdgesASCII(std::ostream &s) const;
-    std::istream& readEdgesASCII(std::istream &s);
-
-    std::ostream& writeNodePosesASCII(std::ostream &s) const;
-    std::istream& readNodePosesASCII(std::istream &s);
-
-    /**
-     * Reads in a ScanGraph from a "plain" ASCII file of the form
-     * NODE x y z R P Y
-     * x y z
-     * x y z
-     * x y z
-     * NODE x y z R P Y
-     * x y z
-     *
-     * Lines starting with the NODE keyword contain the 6D pose of a scan node,
-     * all 3D point following until the next NODE keyword (or end of file) are
-     * inserted into that scan node as pointcloud in its local coordinate frame
-     *
-     * @param input stream to read from
-     * @return read stream
-     */
-    std::istream& readPlainASCII(std::istream& s);
-    void readPlainASCII(const std::string& filename);
-
-   protected:
-
-    std::vector<ScanNode*> nodes;
-    std::vector<ScanEdge*> edges;
-  };
-
+protected:
+  std::vector<ScanNode *> nodes;
+  std::vector<ScanEdge *> edges;
+};
 }
-
 
 #endif

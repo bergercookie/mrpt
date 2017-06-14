@@ -5,25 +5,24 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef XFORM_H
 #define XFORM_H
 
 //#include "cxcore.h"
 // Universal include for all versions of OpenCV
-#include <mrpt/otherlibs/do_opencv_includes.h> 
-
+#include <mrpt/otherlibs/do_opencv_includes.h>
 
 /********************************** Structures *******************************/
 
 struct feature;
 
 /** holds feature data relevant to ransac */
-struct ransac_data
-{
-	void* orig_feat_data;
-	int sampled;
+struct ransac_data {
+  void *orig_feat_data;
+  int sampled;
 };
 
 /******************************* Defs and macros *****************************/
@@ -38,8 +37,7 @@ struct ransac_data
 #define RANSAC_PROB_BAD_SUPP 0.10
 
 /* extracts a feature's RANSAC data */
-#define feat_ransac_data( feat ) ( (struct ransac_data*) (feat)->feature_data )
-
+#define feat_ransac_data(feat) ((struct ransac_data *)(feat)->feature_data)
 
 /**
 Prototype for transformation functions passed to ransac_xform().  Functions
@@ -48,15 +46,13 @@ correspondences.
 
 @param pts array of points
 @param mpts array of corresponding points; each \a pts[\a i], \a i=0..\a n-1,
-	corresponds to \a mpts[\a i]
+        corresponds to \a mpts[\a i]
 @param n number of points in both \a pts and \a mpts
 
 @return Should return a transformation matrix that transforms each point in
-	\a pts to the corresponding point in \a mpts or nullptr on failure.
+        \a pts to the corresponding point in \a mpts or nullptr on failure.
 */
-typedef CvMat* (*ransac_xform_fn)( CvPoint2D64f* pts, CvPoint2D64f* mpts,
-								  int n );
-
+typedef CvMat *(*ransac_xform_fn)(CvPoint2D64f *pts, CvPoint2D64f *mpts, int n);
 
 /**
 Prototype for error functions passed to ransac_xform().  For a given
@@ -69,13 +65,11 @@ the point has been transformed by the transform.
 @param T a transform
 
 @return Should return a measure of error between \a mpt and \a pt after
-	\a pt has been transformed by the transform \a T.
+        \a pt has been transformed by the transform \a T.
 */
-typedef double (*ransac_err_fn)( CvPoint2D64f pt, CvPoint2D64f mpt, CvMat* M );
-
+typedef double (*ransac_err_fn)(CvPoint2D64f pt, CvPoint2D64f mpt, CvMat *M);
 
 /***************************** Function Prototypes ***************************/
-
 
 /**
 Calculates a best-fit image transform from image feature correspondences
@@ -88,38 +82,36 @@ model fitting with applications to image analysis and automated cartography.
 <EM>Communications of the ACM, 24</EM>, 6 (1981), pp. 381--395.
 
 @param features an array of features; only features with a non-NULL match
-	of type \a mtype are used in homography computation
+        of type \a mtype are used in homography computation
 @param n number of features in \a feat
 @param mtype determines which of each feature's match fields to use
-	for transform computation; should be one of FEATURE_FWD_MATCH,
-	FEATURE_BCK_MATCH, or FEATURE_MDL_MATCH; if this is FEATURE_MDL_MATCH,
-	correspondences are assumed to be between a feature's img_pt field
-	and its match's mdl_pt field, otherwise correspondences are assumed to
-	be between the the feature's img_pt field and its match's img_pt field
+        for transform computation; should be one of FEATURE_FWD_MATCH,
+        FEATURE_BCK_MATCH, or FEATURE_MDL_MATCH; if this is FEATURE_MDL_MATCH,
+        correspondences are assumed to be between a feature's img_pt field
+        and its match's mdl_pt field, otherwise correspondences are assumed to
+        be between the the feature's img_pt field and its match's img_pt field
 @param xform_fn pointer to the function used to compute the desired
-	transformation from feature correspondences
+        transformation from feature correspondences
 @param m minimum number of correspondences necessary to instantiate the
-	transform computed by \a xform_fn
+        transform computed by \a xform_fn
 @param p_badxform desired probability that the final transformation
-	returned by RANSAC is corrupted by outliers (i.e. the probability that
-	no samples of all inliers were drawn)
+        returned by RANSAC is corrupted by outliers (i.e. the probability that
+        no samples of all inliers were drawn)
 @param err_fn pointer to the function used to compute a measure of error
-	between putative correspondences for a given transform
+        between putative correspondences for a given transform
 @param err_tol correspondences within this distance of each other are
-	considered as inliers for a given transform
+        considered as inliers for a given transform
 @param inliers if not nullptr, output as an array of pointers to the final
-	set of inliers
+        set of inliers
 @param n_in if not nullptr, output as the final number of inliers
 
 @return Returns a transformation matrix computed using RANSAC or NULL
-	on error or if an acceptable transform could not be computed.
+        on error or if an acceptable transform could not be computed.
 */
-extern CvMat* ransac_xform( struct feature* features, int n, int mtype,
-						   ransac_xform_fn xform_fn, int m,
-						   double p_badxform, ransac_err_fn err_fn,
-						   double err_tol, struct feature*** inliers,
-						   int* n_in );
-
+extern CvMat *ransac_xform(struct feature *features, int n, int mtype,
+                           ransac_xform_fn xform_fn, int m, double p_badxform,
+                           ransac_err_fn err_fn, double err_tol,
+                           struct feature ***inliers, int *n_in);
 
 /**
 Calculates a least-squares planar homography from point correspondeces.
@@ -127,15 +119,14 @@ Intended for use as a ransac_xform_fn.
 
 @param pts array of points
 @param mpts array of corresponding points; each \a pts[\a i], \a i=0..\a n-1,
-	corresponds to \a mpts[\a i]
+        corresponds to \a mpts[\a i]
 @param n number of points in both \a pts and \a mpts; must be at least 4
 
 @return Returns the \f$3 \times 3\f$ least-squares planar homography
-	matrix that transforms points in \a pts to their corresponding points
-	in \a mpts or nullptr if fewer than 4 correspondences were provided
+        matrix that transforms points in \a pts to their corresponding points
+        in \a mpts or nullptr if fewer than 4 correspondences were provided
 */
-extern CvMat* lsq_homog( CvPoint2D64f* pts, CvPoint2D64f* mpts, int n );
-
+extern CvMat *lsq_homog(CvPoint2D64f *pts, CvPoint2D64f *mpts, int n);
 
 /**
 Calculates the transfer error between a point and its correspondence for
@@ -149,8 +140,7 @@ ransac_err_fn.
 
 @return Returns the transfer error between \a pt and \a mpt given \a H
 */
-extern double homog_xfer_err( CvPoint2D64f pt, CvPoint2D64f mpt, CvMat* H );
-
+extern double homog_xfer_err(CvPoint2D64f pt, CvPoint2D64f mpt, CvMat *H);
 
 /**
 Performs a perspective transformation on a single point.  That is, for a
@@ -170,7 +160,6 @@ Note that affine transforms are a subset of perspective transforms.
 
 @return Returns the point \f$(u, v)\f$ as above.
 */
-extern CvPoint2D64f persp_xform_pt( CvPoint2D64f pt, CvMat* T );
-
+extern CvPoint2D64f persp_xform_pt(CvPoint2D64f pt, CvMat *T);
 
 #endif

@@ -5,15 +5,19 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 // BEWARE: BETA VERSION
 // --------------------
 //
-// Utilities for arbitrary dimensional points in space. All points are treated as simple value
+// Utilities for arbitrary dimensional points in space. All points are treated
+// as simple value
 // arrays. This is done for two reasons:
-//   - Using value arrays instead of a point class makes all point operations very explicit, which
+//   - Using value arrays instead of a point class makes all point operations
+//   very explicit, which
 //     makes their usage easier to optimize.
-//   - A value array is about as universal a format as possible, which makes it easier for
+//   - A value array is about as universal a format as possible, which makes it
+//   easier for
 //     people to use the k-means code in any project.
 // Also contains assertion code that can be disabled if desired.
 //
@@ -29,13 +33,13 @@
  * Add a specific case for apple
  */
 #ifdef HAVE_MALLOC_H
-# include <malloc.h>
+#include <malloc.h>
 #elif defined(HAVE_MALLOC_MALLOC_H)
-# include <malloc/malloc.h>
+#include <malloc/malloc.h>
 #endif
 
-#include <memory.h>
 #include <cstdlib>
+#include <memory.h>
 
 // The data-type used for a single coordinate for points
 typedef double Scalar;
@@ -45,12 +49,10 @@ typedef double Scalar;
 
 // Point creation and deletion
 inline Scalar *PointAllocate(int d) {
-  return (Scalar*)malloc(d * sizeof(Scalar));
+  return (Scalar *)malloc(d * sizeof(Scalar));
 }
 
-inline void PointFree(Scalar *p) {
-  free(p);
-}
+inline void PointFree(Scalar *p) { free(p); }
 
 inline void PointCopy(Scalar *p1, const Scalar *p2, int d) {
   memcpy(p1, p2, d * sizeof(Scalar));
@@ -80,9 +82,11 @@ inline Scalar PointDistSq(const Scalar *p1, const Scalar *p2, int d) {
 // Comment out ENABLE_KMEANS_ASSERTS to turn off ASSERTS for added speed.
 #define ENABLE_KMEANS_ASSERTS
 #ifdef ENABLE_KMEANS_ASSERTS
-int __KMeansAssertionFailure(const char *file, int line, const char *expression);
-#define KM_ASSERT(expression) \
-  (void)((expression) != 0? 0 : __KMeansAssertionFailure(__FILE__, __LINE__, #expression))
+int __KMeansAssertionFailure(const char *file, int line,
+                             const char *expression);
+#define KM_ASSERT(expression)                                                  \
+  (void)((expression) != 0 ? 0 : __KMeansAssertionFailure(__FILE__, __LINE__,  \
+                                                          #expression))
 #else
 #define KM_ASSERT(expression)
 #endif
@@ -90,8 +94,10 @@ int __KMeansAssertionFailure(const char *file, int line, const char *expression)
 // Miscellaneous utilities
 // =======================
 
-// Returns a random integer chosen uniformly from the range [0, n-1]. Note that RAND_MAX could be
-// less than n. On Visual Studio, it is only 32767. For larger values of RAND_MAX, we need to be
+// Returns a random integer chosen uniformly from the range [0, n-1]. Note that
+// RAND_MAX could be
+// less than n. On Visual Studio, it is only 32767. For larger values of
+// RAND_MAX, we need to be
 // careful of overflow.
 inline int GetRandom(int n) {
   int u = rand() * RAND_MAX + rand();

@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_BASE_SE_H
 #define OCTOMAP_OCTREE_BASE_SE_H
 
@@ -51,41 +52,36 @@
 #include "OcTreeBase.h"
 #include "OcTreeLUT.h"
 
-
 namespace octomap {
 
+template <class NODE> class OcTreeBaseSE : public OcTreeBase<NODE> {
 
-  template <class NODE>
-    class OcTreeBaseSE: public OcTreeBase<NODE> {
+public:
+  OcTreeBaseSE(double _resolution);
+  virtual ~OcTreeBaseSE();
 
-  public:
+  /**
+   * Traces a ray from origin to end (excluding), returning the
+   * coordinates of all nodes traversed by the beam.
+   * (Essentially using the DDA algorithm in 3D).
+   *
+   * @param origin start coordinate of ray
+   * @param end end coordinate of ray
+   * @param ray KeyRay structure that holds the keys of all nodes traversed by
+   * the ray, excluding "end"
+   * @return Success of operation. Returning false usually means that one of the
+   * coordinates is out of the OcTree's range
+   */
+  bool computeRayKeys(const point3d &origin, const point3d &end,
+                      KeyRay &ray) const;
 
-    OcTreeBaseSE(double _resolution);
-    virtual ~OcTreeBaseSE();
-    
-   /**
-    * Traces a ray from origin to end (excluding), returning the
-    * coordinates of all nodes traversed by the beam.
-    * (Essentially using the DDA algorithm in 3D).
-    *
-    * @param origin start coordinate of ray
-    * @param end end coordinate of ray
-    * @param ray KeyRay structure that holds the keys of all nodes traversed by the ray, excluding "end"
-    * @return Success of operation. Returning false usually means that one of the coordinates is out of the OcTree's range
-    */
-    bool computeRayKeys(const point3d& origin, const point3d& end, KeyRay& ray) const;
+  NODE *getLUTNeighbor(const point3d &value,
+                       OcTreeLUT::NeighborDirection dir) const;
 
-    NODE* getLUTNeighbor(const point3d& value, OcTreeLUT::NeighborDirection dir) const;
-
-
-  protected:
-
-    KeyRay keyray;
-    OcTreeLUT* lut;
-
-  };
-
-
+protected:
+  KeyRay keyray;
+  OcTreeLUT *lut;
+};
 }
 
 #include "OcTreeBaseSE.hxx"

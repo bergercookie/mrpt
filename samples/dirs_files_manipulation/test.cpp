@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 /** Following functions investigate the directory manipulation capabilities in
  * MRPT. Functions are called from the main function in the end of the script.
@@ -14,14 +15,13 @@
  * documentation of the functions
  */
 
-#include <mrpt/utils.h>
 #include <mrpt/poses/CPose2D.h>
 #include <mrpt/poses/CPosePDF.h>
 #include <mrpt/system.h>
+#include <mrpt/utils.h>
 
-#include <string>
 #include <sstream>
-
+#include <string>
 
 using namespace mrpt;
 using namespace mrpt::poses;
@@ -33,8 +33,7 @@ using namespace std;
  * Open and write some content in a file inside the directory
  * If directory exists delete it altogether.
  */
-void setupDirContents()
-{
+void setupDirContents() {
   CFileOutputStream f;
 
   string dir_name = "dir_a";
@@ -52,17 +51,15 @@ void setupDirContents()
       f.printf("some more random text.\n");
       f.printf("CPose2D: %s", a_pose.asString().c_str());
       f.close();
-    }
-    else {
+    } else {
       cout << "file was NOT opened successfully" << endl;
       return;
     }
-  }
-  else {
+  } else {
     cout << "directory " << dir_name << " exists. " << endl;
     cout << "removing directory altogether... " << endl;
-    deleteFilesInDirectory(dir_name, 
-        /* deleteDirectoryAsWell = */ true);
+    deleteFilesInDirectory(dir_name,
+                           /* deleteDirectoryAsWell = */ true);
   }
 }
 
@@ -82,7 +79,8 @@ void renameDirContents() {
   string cur_time_validstr(fileNameStripInvalidChars(cur_time_str));
   string string_to_add = "_renamed_" + cur_time_validstr;
 
-  bool success; // flag for specifying whether an operation was successfully completed
+  bool success; // flag for specifying whether an operation was successfully
+                // completed
 
   if (!directoryExists(dir_name)) {
     cout << "directory " << dir_name << " doesn't exist. " << endl;
@@ -96,61 +94,54 @@ void renameDirContents() {
   // build the initial directory contents
   for (int i = 0; i < 10; i++) {
     ss_tmp.str("");
-    ss_tmp << dir_name <<  "/" << fname << i;
+    ss_tmp << dir_name << "/" << fname << i;
     f.open(ss_tmp.str());
     f.printf("dummy text in file...");
     f.close();
   }
 
-  // rename all the contents (of depth 1) 
+  // rename all the contents (of depth 1)
   for (int i = 0; i < 10; i++) {
     ss_tmp.str("");
     ss_tmp << dir_name << "/" << fname << i;
-    success = renameFile(ss_tmp.str(), 
-        /*new_name = */ ss_tmp.str()+string_to_add);
+    success = renameFile(ss_tmp.str(),
+                         /*new_name = */ ss_tmp.str() + string_to_add);
   }
 
   // finally rename the directory itself
-  cout << "Renaming directory " << dir_name << " to: " <<
-    dir_name << string_to_add << endl;
-  string* err_msg = nullptr; // flag for catching the error msg if any..
-  success = renameFile(dir_name, 
-      dir_name+string_to_add, err_msg);
+  cout << "Renaming directory " << dir_name << " to: " << dir_name
+       << string_to_add << endl;
+  string *err_msg = nullptr; // flag for catching the error msg if any..
+  success = renameFile(dir_name, dir_name + string_to_add, err_msg);
   if (success) {
     cout << "Directory renaming was successful!" << endl;
-  }
-  else {
-    THROW_EXCEPTION("Error while trying to rename directory: " << dir_name) 
+  } else {
+    THROW_EXCEPTION("Error while trying to rename directory: " << dir_name)
   }
 }
-
 
 //
 // MAIN
 //
-int main()
-{
+int main() {
   char c;
-	try
-	{
-    cout << "Running setupDirContents fun..."  << endl;
-    cout << "------------------------------"   << endl;
+  try {
+    cout << "Running setupDirContents fun..." << endl;
+    cout << "------------------------------" << endl;
     setupDirContents();
-    cout << "Press a key to continue..."       << endl; c = getchar();
+    cout << "Press a key to continue..." << endl;
+    c = getchar();
 
     cout << "Running RenameDirContents fun..." << endl;
-    cout << "------------------------------"   << endl;
+    cout << "------------------------------" << endl;
     renameDirContents();
 
-		return 0;
-	} catch (std::exception &e)
-	{
-		std::cout << "MRPT exception caught: " << e.what() << std::endl;
-		return -1;
-	}
-	catch (...)
-	{
-		printf("Untyped exception!!");
-		return -1;
-	}
+    return 0;
+  } catch (std::exception &e) {
+    std::cout << "MRPT exception caught: " << e.what() << std::endl;
+    return -1;
+  } catch (...) {
+    printf("Untyped exception!!");
+    return -1;
+  }
 }

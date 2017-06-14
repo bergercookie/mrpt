@@ -5,107 +5,97 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef CDetectableObject_H
 #define CDetectableObject_H
 
-#include <mrpt/utils/CSerializable.h>
 #include <mrpt/obs/CObservation.h>
+#include <mrpt/utils/CSerializable.h>
 #define _USE_MATH_DEFINES // (For VS to define M_PI, etc. in cmath)
 #include <cmath>
 
 #include <mrpt/detectors/link_pragmas.h>
 
-namespace mrpt
-{
-	namespace detectors
-	{
+namespace mrpt {
+namespace detectors {
 
-		/** Base class that contains common atributes and functions of detectable objects.
-		  * It was initially thought for detected objects in images from cams, but it's easily
-		  * expandable to other source types (f.i. scanners).
-		  * \ingroup mrpt_detectors_grp
-		  */
-		class DETECTORS_IMPEXP CDetectableObject: public mrpt::utils::CSerializable
-		{
-			DEFINE_VIRTUAL_SERIALIZABLE( CDetectableObject )
+/** Base class that contains common atributes and functions of detectable
+ * objects.
+  * It was initially thought for detected objects in images from cams, but it's
+ * easily
+  * expandable to other source types (f.i. scanners).
+  * \ingroup mrpt_detectors_grp
+  */
+class DETECTORS_IMPEXP CDetectableObject : public mrpt::utils::CSerializable {
+  DEFINE_VIRTUAL_SERIALIZABLE(CDetectableObject)
 
-		public:
+public:
+  std::string m_id; //!< Must be an unique id for each detectable object
 
-			std::string	m_id; //!< Must be an unique id for each detectable object
+  mrpt::obs::CObservation::Ptr
+      obs; //!< Observation wich contain the deteted object
 
-			mrpt::obs::CObservation::Ptr	obs; //!< Observation wich contain the deteted object
+  inline void setObservation(mrpt::obs::CObservation::Ptr newObs) {
+    obs = newObs;
+  };
 
-			inline void setObservation( mrpt::obs::CObservation::Ptr newObs ){	obs = newObs;	};
+}; // End of class
+DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE(CDetectableObject,
+                                             mrpt::utils::CSerializable,
+                                             DETECTORS_IMPEXP)
 
-		}; // End of class
-		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectableObject, mrpt::utils::CSerializable, DETECTORS_IMPEXP )
+class DETECTORS_IMPEXP CDetectable2D : public CDetectableObject {
+  DEFINE_SERIALIZABLE(CDetectable2D)
 
+public:
+  float m_x, m_y;          //!< 2D Coordinates of detected object
+  float m_height, m_width; //!< Size of detected object
 
+  /** Extra constructor */
+  CDetectable2D(const int &x = 0, const int &y = 0, const int &height = 0,
+                const int &width = 0)
+      : m_x(x), m_y(y), m_height(height), m_width(width){};
 
-		class DETECTORS_IMPEXP CDetectable2D: public CDetectableObject
-		{
-			DEFINE_SERIALIZABLE( CDetectable2D )
+  /** Copy pointer content constructor */
+  CDetectable2D(const CDetectable2D *d) { *this = *d; };
 
-		public:
+  /** Compute distance between centers of two detectable 2D objects.
+    * \return calculated distance.
+    */
+  inline double distanceTo(const CDetectable2D &d2) {
+    // Calculate objects centers
+    double c_x1 = (m_x + m_width / 2);
+    double c_x2 = (d2.m_x + d2.m_width / 2);
+    double c_y1 = (m_y + m_height / 2);
+    double c_y2 = (d2.m_y + d2.m_height / 2);
 
-			float m_x, m_y; //!< 2D Coordinates of detected object
-			float m_height, m_width; //!< Size of detected object
+    return std::sqrt(std::pow(c_x1 - c_x2, 2) + pow(c_y1 - c_y2, 2));
+  };
+};
+DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE(CDetectable2D,
+                                             mrpt::detectors::CDetectableObject,
+                                             DETECTORS_IMPEXP)
 
-			/** Extra constructor */
-			CDetectable2D( const int &x = 0, const int &y = 0, const int &height = 0, const int &width = 0 )
-				: m_x(x), m_y(y), m_height(height), m_width(width)
-			{};
+class DETECTORS_IMPEXP CDetectable3D : public CDetectable2D {
+  DEFINE_SERIALIZABLE(CDetectable3D)
 
-			/** Copy pointer content constructor */
-			CDetectable2D( const CDetectable2D *d )
-			{
-				*this = *d;
-			};
+public:
+  CDetectable3D(){};
 
-			/** Compute distance between centers of two detectable 2D objects.
-			  * \return calculated distance.
-			  */
-			inline double distanceTo( const CDetectable2D &d2 )
-			{
-				// Calculate objects centers
-				double c_x1 = ( m_x + m_width/2 );
-				double c_x2 = ( d2.m_x + d2.m_width/2 );
-				double c_y1 = ( m_y + m_height/2 ) ;
-				double c_y2 = ( d2.m_y + d2.m_height/2 ) ;
+  CDetectable3D(const CDetectable2D::Ptr &object2d);
 
-				return std::sqrt( std::pow( c_x1 - c_x2, 2 ) + pow( c_y1 - c_y2, 2 ) );
-			};
+  /** Copy pointer content constructor */
+  CDetectable3D(const CDetectable3D *d) { *this = *d; };
 
-		};
-		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectable2D, mrpt::detectors::CDetectableObject, DETECTORS_IMPEXP )
+  float m_z; //!< Z coordinate of detected object
 
-
-
-		class DETECTORS_IMPEXP CDetectable3D: public CDetectable2D
-		{
-			DEFINE_SERIALIZABLE( CDetectable3D )
-
-		public:
-
-			CDetectable3D(){};
-
-			CDetectable3D( const CDetectable2D::Ptr &object2d );
-
-			/** Copy pointer content constructor */
-			CDetectable3D( const CDetectable3D *d )
-			{
-				*this = *d;
-			};
-
-
-			float		m_z; //!< Z coordinate of detected object
-
-		}; // End of class
-		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectable3D, mrpt::detectors::CDetectable2D, DETECTORS_IMPEXP )
-	}
-
+}; // End of class
+DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE(CDetectable3D,
+                                             mrpt::detectors::CDetectable2D,
+                                             DETECTORS_IMPEXP)
+}
 }
 
 #endif

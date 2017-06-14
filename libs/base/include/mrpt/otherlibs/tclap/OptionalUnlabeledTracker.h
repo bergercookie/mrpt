@@ -5,8 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
-
+   +---------------------------------------------------------------------------+
+   */
 
 /******************************************************************************
  *
@@ -28,7 +28,6 @@
  *
  *****************************************************************************/
 
-
 #ifndef TCLAP_OPTIONAL_UNLABELED_TRACKER_H
 #define TCLAP_OPTIONAL_UNLABELED_TRACKER_H
 
@@ -36,36 +35,33 @@
 
 namespace TCLAP {
 
-template <class DUMMY = int>
-class OptionalUnlabeledTracker
-{
+template <class DUMMY = int> class OptionalUnlabeledTracker {
 
-	public:
+public:
+  static void check(bool req, const std::string &argName);
 
-		static void check( bool req, const std::string& argName );
+  static void gotOptional() { alreadyOptionalRef() = true; }
 
-		static void gotOptional() { alreadyOptionalRef() = true; }
+  static bool &alreadyOptional() { return alreadyOptionalRef(); }
 
-		static bool& alreadyOptional() { return alreadyOptionalRef(); }
-
-	private:
-
-		static bool& alreadyOptionalRef() { static bool ct = false; return ct; }
+private:
+  static bool &alreadyOptionalRef() {
+    static bool ct = false;
+    return ct;
+  }
 };
 
-
 template <class DUMMY>
-void OptionalUnlabeledTracker<DUMMY>::check( bool req, const std::string& argName )
-{
-    if ( OptionalUnlabeledTracker::alreadyOptional() )
-        throw( SpecificationException(
-	"You can't specify ANY Unlabeled Arg following an optional Unlabeled Arg",
-	                argName ) );
+void OptionalUnlabeledTracker<DUMMY>::check(bool req,
+                                            const std::string &argName) {
+  if (OptionalUnlabeledTracker::alreadyOptional())
+    throw(SpecificationException("You can't specify ANY Unlabeled Arg "
+                                 "following an optional Unlabeled Arg",
+                                 argName));
 
-    if ( !req )
-        OptionalUnlabeledTracker::gotOptional();
+  if (!req)
+    OptionalUnlabeledTracker::gotOptional();
 }
-
 
 } // namespace TCLAP
 

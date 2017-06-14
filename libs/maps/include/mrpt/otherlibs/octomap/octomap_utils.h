@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 // $Id: octomap_utils.h 401 2012-08-03 15:16:39Z ahornung $
 
 /**
@@ -50,20 +51,17 @@
 
 #include <math.h>
 
-namespace octomap{
+namespace octomap {
 
-  /// compute log-odds from probability:
-  inline float logodds(double probability){
-    return (float) log(probability/(1-probability));
-  }
-
-  /// compute probability from logodds:
-  inline double probability(double logodds){
-    return 1. - ( 1. / (1. + exp(logodds)));
-
-  }
+/// compute log-odds from probability:
+inline float logodds(double probability) {
+  return (float)log(probability / (1 - probability));
 }
 
-
+/// compute probability from logodds:
+inline double probability(double logodds) {
+  return 1. - (1. / (1. + exp(logodds)));
+}
+}
 
 #endif /* OCTOMAP_UTILS_H_ */

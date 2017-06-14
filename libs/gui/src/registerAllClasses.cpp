@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #include "gui-precomp.h"
 
@@ -17,6 +18,4 @@
 using namespace mrpt::gui;
 using namespace mrpt::utils;
 
-MRPT_INITIALIZER(registerAllClasses_mrpt_gui)
-{
-}
+MRPT_INITIALIZER(registerAllClasses_mrpt_gui) {}

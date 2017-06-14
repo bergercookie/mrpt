@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_OCTREE_NODE_H
 #define OCTOMAP_OCTREE_NODE_H
 
@@ -14,7 +15,8 @@
 /**
 * OctoMap:
 * A probabilistic, flexible, and compact 3D mapping library for robotic systems.
-* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C) 2009-2011
+* @author K. M. Wurm, A. Hornung, University of Freiburg, Copyright (C)
+* 2009-2011
 * @see http://octomap.sourceforge.net/
 * License: New BSD License
 */
@@ -48,70 +50,71 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "OcTreeDataNode.h"
 #include "octomap_types.h"
 #include "octomap_utils.h"
-#include "OcTreeDataNode.h"
 #include <limits>
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 
 namespace octomap {
 
+/**
+ * Nodes to be used in OcTree. They represent 3d occupancy grid cells.
+ * "value" stores their log-odds occupancy.
+ *
+ * Hint: If a class is derived from OcTreeNode, you have to implement (at least)
+ * createChild, getChild, and getChild const. See OcTreeNodeLabeled for an
+ * example.
+ *
+ */
+class MAPS_IMPEXP OcTreeNode : public OcTreeDataNode<float> {
+
+public:
+  OcTreeNode();
+  ~OcTreeNode();
+
+  bool createChild(unsigned int i);
+
+  // overloaded, so that the return type is correct:
+  inline OcTreeNode *getChild(unsigned int i) {
+    return static_cast<OcTreeNode *>(OcTreeDataNode<float>::getChild(i));
+  }
+  inline const OcTreeNode *getChild(unsigned int i) const {
+    return static_cast<const OcTreeNode *>(OcTreeDataNode<float>::getChild(i));
+  }
+
+  // -- node occupancy  ----------------------------
+
+  /// \return occupancy probability of node
+  inline double getOccupancy() const { return probability(value); }
+
+  /// \return log odds representation of occupancy probability of node
+  inline float getLogOdds() const { return value; }
+  /// sets log odds occupancy of node
+  inline void setLogOdds(float l) { value = l; }
+
   /**
-   * Nodes to be used in OcTree. They represent 3d occupancy grid cells.
-   * "value" stores their log-odds occupancy.
-   *
-   * Hint: If a class is derived from OcTreeNode, you have to implement (at least) 
-   * createChild, getChild, and getChild const. See OcTreeNodeLabeled for an example.
-   *
+   * @return mean of all children's occupancy probabilities, in log odds
    */
-  class MAPS_IMPEXP OcTreeNode : public OcTreeDataNode<float> {
+  double getMeanChildLogOdds() const;
 
-  public:
-    OcTreeNode();
-    ~OcTreeNode();
+  /**
+   * @return maximum of children's occupancy probabilities, in log odds
+   */
+  float getMaxChildLogOdds() const;
 
-    bool createChild(unsigned int i);
+  /// update this node's occupancy according to its children's maximum occupancy
+  inline void updateOccupancyChildren() {
+    this->setLogOdds(this->getMaxChildLogOdds()); // conservative
+  }
 
-    // overloaded, so that the return type is correct:
-    inline OcTreeNode* getChild(unsigned int i) {
-      return static_cast<OcTreeNode*> (OcTreeDataNode<float>::getChild(i));
-    }
-    inline const OcTreeNode* getChild(unsigned int i) const {
-      return static_cast<const OcTreeNode*> (OcTreeDataNode<float>::getChild(i));
-    }
+  /// adds p to the node's logOdds value (with no boundary / threshold
+  /// checking!)
+  void addValue(const float &p);
 
-    // -- node occupancy  ----------------------------
-
-    /// \return occupancy probability of node
-    inline double getOccupancy() const { return probability(value); }
-
-    /// \return log odds representation of occupancy probability of node
-    inline float getLogOdds() const{ return value; }
-    /// sets log odds occupancy of node
-    inline void setLogOdds(float l) { value = l; }
-
-    /**
-     * @return mean of all children's occupancy probabilities, in log odds
-     */
-    double getMeanChildLogOdds() const;
-
-    /**
-     * @return maximum of children's occupancy probabilities, in log odds
-     */
-    float getMaxChildLogOdds() const;
-
-    /// update this node's occupancy according to its children's maximum occupancy
-    inline void updateOccupancyChildren() {
-      this->setLogOdds(this->getMaxChildLogOdds());  // conservative
-    }
-
-    /// adds p to the node's logOdds value (with no boundary / threshold checking!)
-    void addValue(const float& p);
-    
-
-  protected:
-    // "value" stores log odds occupancy probability
-  };
+protected:
+  // "value" stores log odds occupancy probability
+};
 
 } // end namespace
 

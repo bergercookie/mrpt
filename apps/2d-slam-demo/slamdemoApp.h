@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 
 #ifndef SLAMDEMOAPP_H
 #define SLAMDEMOAPP_H
@@ -19,18 +20,17 @@
 
 class slamdemoFrame;
 
-class slamdemoApp : public wxApp
-{
-	bool doCommandLineProcess();
-	void DoBatchExperiments(const std::string &cfgFil);
+class slamdemoApp : public wxApp {
+  bool doCommandLineProcess();
+  void DoBatchExperiments(const std::string &cfgFil);
 
-	slamdemoFrame* win;
+  slamdemoFrame *win;
 
-    public:
-        virtual bool OnInit();
+public:
+  virtual bool OnInit();
 
-	private:
-		bool  m_option_norun;
+private:
+  bool m_option_norun;
 };
 
 #endif // SLAMDEMOAPP_H

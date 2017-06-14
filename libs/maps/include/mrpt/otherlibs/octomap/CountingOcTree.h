@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 #ifndef OCTOMAP_COUNTING_OCTREE_HH
 #define OCTOMAP_COUNTING_OCTREE_HH
 
@@ -48,92 +49,87 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#include <stdio.h>
 #include "OcTreeBase.h"
 #include "OcTreeDataNode.h"
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <stdio.h>
 
 namespace octomap {
 
+/**
+ * An Octree-node which stores an internal counter per node / volume.
+ *
+ * Count is recursive, parent nodes have the summed count of their
+ * children.
+ *
+ * \note In our mapping system this data structure is used in
+ *       CountingOcTree in the sensor model only
+ */
+class /*MAPS_IMPEXP*/ CountingOcTreeNode : public OcTreeDataNode<unsigned int> {
+
+public:
+  CountingOcTreeNode();
+  ~CountingOcTreeNode();
+  bool createChild(unsigned int i);
+
+  inline CountingOcTreeNode *getChild(unsigned int i) {
+    return static_cast<CountingOcTreeNode *>(
+        OcTreeDataNode<unsigned int>::getChild(i));
+  }
+
+  inline const CountingOcTreeNode *getChild(unsigned int i) const {
+    return static_cast<const CountingOcTreeNode *>(
+        OcTreeDataNode<unsigned int>::getChild(i));
+  }
+
+  inline unsigned int getCount() const { return getValue(); }
+  inline void increaseCount() { value++; }
+  inline void setCount(unsigned c) { this->setValue(c); }
+
+  // overloaded:
+  void expandNode();
+};
+
+/**
+ * An AbstractOcTree which stores an internal counter per node / volume.
+ *
+ * Count is recursive, parent nodes have the summed count of their
+ * children.
+ *
+ * \note In our mapping system this data structure is used in
+ *       the sensor model only. Do not use, e.g., insertScan.
+ */
+class /*MAPS_IMPEXP*/ CountingOcTree : public OcTreeBase<CountingOcTreeNode> {
+
+public:
+  /// Default constructor, sets resolution of leafs
+  CountingOcTree(double resolution)
+      : OcTreeBase<CountingOcTreeNode>(resolution){};
+  virtual CountingOcTreeNode *updateNode(const point3d &value);
+  CountingOcTreeNode *updateNode(const OcTreeKey &k);
+  void getCentersMinHits(point3d_list &node_centers,
+                         unsigned int min_hits) const;
+
+protected:
+  void getCentersMinHitsRecurs(point3d_list &node_centers,
+                               unsigned int &min_hits, unsigned int max_depth,
+                               CountingOcTreeNode *node, unsigned int depth,
+                               const OcTreeKey &parent_key) const;
+
   /**
-   * An Octree-node which stores an internal counter per node / volume.
-   *
-   * Count is recursive, parent nodes have the summed count of their
-   * children.
-   *
-   * \note In our mapping system this data structure is used in
-   *       CountingOcTree in the sensor model only
+   * Static member object which ensures that this OcTree's prototype
+   * ends up in the classIDMapping only once
    */
-  class /*MAPS_IMPEXP*/ CountingOcTreeNode : public OcTreeDataNode<unsigned int> {
-
+  class StaticMemberInitializer {
   public:
-
-    CountingOcTreeNode();
-    ~CountingOcTreeNode();
-    bool createChild(unsigned int i);
-
-    inline CountingOcTreeNode* getChild(unsigned int i) {
-      return static_cast<CountingOcTreeNode*> (OcTreeDataNode<unsigned int>::getChild(i));
+    StaticMemberInitializer() {
+      CountingOcTree *tree = new CountingOcTree(0.1);
+      AbstractOcTree::registerTreeType(tree);
     }
-
-    inline const CountingOcTreeNode* getChild(unsigned int i) const {
-      return static_cast<const CountingOcTreeNode*> (OcTreeDataNode<unsigned int>::getChild(i));
-    }
-
-    inline unsigned int getCount() const { return getValue(); }
-    inline void increaseCount() { value++; }
-    inline void setCount(unsigned c) {this->setValue(c); }
-
-    // overloaded:
-    void expandNode();
   };
-
-
-
-  /**
-   * An AbstractOcTree which stores an internal counter per node / volume.
-   *
-   * Count is recursive, parent nodes have the summed count of their
-   * children.
-   *
-   * \note In our mapping system this data structure is used in
-   *       the sensor model only. Do not use, e.g., insertScan.
-   */
-  class /*MAPS_IMPEXP*/ CountingOcTree : public OcTreeBase <CountingOcTreeNode> {
-
-  public:
-    /// Default constructor, sets resolution of leafs
-    CountingOcTree(double resolution) : OcTreeBase<CountingOcTreeNode>(resolution) {};    
-    virtual CountingOcTreeNode* updateNode(const point3d& value);
-    CountingOcTreeNode* updateNode(const OcTreeKey& k);
-    void getCentersMinHits(point3d_list& node_centers, unsigned int min_hits) const;
-
-  protected:
-
-    void getCentersMinHitsRecurs( point3d_list& node_centers,
-                                  unsigned int& min_hits,
-                                  unsigned int max_depth,
-                                  CountingOcTreeNode* node, unsigned int depth,
-                                  const OcTreeKey& parent_key) const;
-
-    /**
-     * Static member object which ensures that this OcTree's prototype
-     * ends up in the classIDMapping only once
-     */
-    class StaticMemberInitializer{
-       public:
-         StaticMemberInitializer() {
-           CountingOcTree* tree = new CountingOcTree(0.1);
-           AbstractOcTree::registerTreeType(tree);
-         }
-    };
-    /// static member to ensure static initialization (only once)
-    static StaticMemberInitializer countingOcTreeMemberInit;
-  };
-
-
+  /// static member to ensure static initialization (only once)
+  static StaticMemberInitializer countingOcTreeMemberInit;
+};
 }
-
 
 #endif

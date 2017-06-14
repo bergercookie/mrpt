@@ -5,7 +5,8 @@
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file        |
    | See: http://www.mrpt.org/Authors - All rights reserved.                   |
    | Released under BSD License. See details in http://www.mrpt.org/License    |
-   +---------------------------------------------------------------------------+ */
+   +---------------------------------------------------------------------------+
+   */
 // $Id: Pointcloud.h 205 2011-06-10 11:58:40Z ahornung $
 
 /**
@@ -48,90 +49,84 @@
 #ifndef OCTOMAP_POINTCLOUD_H
 #define OCTOMAP_POINTCLOUD_H
 
-#include <vector>
 #include <list>
 #include <mrpt/otherlibs/octomap/octomap_types.h>
+#include <vector>
 
-#include <mrpt/maps/link_pragmas.h>  // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
+#include <mrpt/maps/link_pragmas.h> // For DLL export within mrpt-maps via the MAPS_IMPEXP macro
 
 namespace octomap {
 
-  /**
-   * A collection of 3D coordinates (point3d), which are regarded as endpoints of a
-   * 3D laser scan.
-   */
-  class Pointcloud {
+/**
+ * A collection of 3D coordinates (point3d), which are regarded as endpoints of
+ * a
+ * 3D laser scan.
+ */
+class Pointcloud {
 
-  public:
+public:
+  Pointcloud();
+  ~Pointcloud();
 
-    Pointcloud();
-    ~Pointcloud();
+  Pointcloud(const Pointcloud &other);
+  Pointcloud(Pointcloud *other);
 
-    Pointcloud(const Pointcloud& other);
-    Pointcloud(Pointcloud* other);
+  size_t size() const { return points.size(); }
+  void clear();
+  inline void reserve(size_t size) { points.reserve(size); }
 
-    size_t size() const {  return points.size(); }
-    void clear();
-    inline void reserve(size_t size) {points.reserve(size); }
+  inline void push_back(float x, float y, float z) {
+    points.push_back(point3d(x, y, z));
+  }
+  inline void push_back(const point3d &p) { points.push_back(p); }
+  inline void push_back(point3d *p) { points.push_back(*p); }
 
-    inline void push_back(float x, float y, float z) {
-      points.push_back(point3d(x,y,z));
-    }
-    inline void push_back(const point3d& p) {
-      points.push_back(p);
-    }
-    inline void push_back(point3d* p) {
-       points.push_back(*p);
-    }
+  /// Add points from other Pointcloud
+  void push_back(const Pointcloud &other);
 
-    /// Add points from other Pointcloud
-    void push_back(const Pointcloud& other);
+  /// Export the Pointcloud to a VRML file
+  void writeVrml(std::string filename);
 
-    /// Export the Pointcloud to a VRML file
-    void writeVrml(std::string filename);
+  /// Apply transform to each point
+  void transform(pose6d transform);
 
-    /// Apply transform to each point
-    void transform(pose6d transform);
+  /// Rotate each point in pointcloud
+  void rotate(double roll, double pitch, double yaw);
 
-    /// Rotate each point in pointcloud
-    void rotate(double roll, double pitch, double yaw);
+  /// Apply transform to each point, undo previous transforms
+  void transformAbsolute(pose6d transform);
 
-    /// Apply transform to each point, undo previous transforms
-    void transformAbsolute(pose6d transform);
+  /// Calculate bounding box of Pointcloud
+  void calcBBX(point3d &lowerBound, point3d &upperBound) const;
+  /// Crop Pointcloud to given bounding box
+  void crop(point3d lowerBound, point3d upperBound);
 
-    /// Calculate bounding box of Pointcloud
-    void calcBBX(point3d& lowerBound, point3d& upperBound) const;
-    /// Crop Pointcloud to given bounding box
-    void crop(point3d lowerBound, point3d upperBound);
+  // removes any points closer than [thres] to (0,0,0)
+  void minDist(double thres);
 
-    // removes any points closer than [thres] to (0,0,0)
-    void minDist(double thres);
+  void subSampleRandom(unsigned int num_samples, Pointcloud &sample_cloud);
 
-    void subSampleRandom(unsigned int num_samples, Pointcloud& sample_cloud);
+  // iterators ------------------
 
-    // iterators ------------------
+  typedef point3d_collection::iterator iterator;
+  typedef point3d_collection::const_iterator const_iterator;
+  iterator begin() { return points.begin(); }
+  iterator end() { return points.end(); }
+  const_iterator begin() const { return points.begin(); }
+  const_iterator end() const { return points.end(); }
+  point3d back() { return points.back(); }
+  point3d getPoint(unsigned int i); // may return NULL
 
-    typedef point3d_collection::iterator iterator;
-    typedef point3d_collection::const_iterator const_iterator;
-    iterator begin() { return points.begin(); }
-    iterator end()   { return points.end(); }
-    const_iterator begin() const { return points.begin(); }
-    const_iterator end() const  { return points.end(); }
-    point3d back()  { return points.back(); }
-    point3d getPoint(unsigned int i);   // may return NULL
+  // I/O methods
 
-    // I/O methods
+  std::istream &readBinary(std::istream &s);
+  std::istream &read(std::istream &s);
+  std::ostream &writeBinary(std::ostream &s) const;
 
-    std::istream& readBinary(std::istream &s);
-    std::istream& read(std::istream &s);
-    std::ostream& writeBinary(std::ostream &s) const;
-
-  protected:
-    pose6d               current_inv_transform;
-    point3d_collection   points;
-  };
-
+protected:
+  pose6d current_inv_transform;
+  point3d_collection points;
+};
 }
-
 
 #endif
