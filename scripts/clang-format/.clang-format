@@ -52,7 +52,7 @@ BasedOnStyle: Google
   #BeforeElse:      true
   #IndentBraces:    false
 #BreakBeforeBinaryOperators: None
-#BreakBeforeBraces: Attach
+BreakBeforeBraces: Allman
 #BreakBeforeTernaryOperators: true
 #BreakConstructorInitializersBeforeComma: false
 #ColumnLimit:     83
@@ -69,13 +69,13 @@ BasedOnStyle: Google
 #IncludeCategories:
   #- Regex:           '.*'
     #Priority:        1
-#IndentCaseLabels: true
-#IndentWidth:     4
+IndentCaseLabels: true
+IndentWidth:     4
 #IndentWrappedFunctionNames: false
 #KeepEmptyLinesAtTheStartOfBlocks: true
 #MacroBlockBegin: ''
 #MacroBlockEnd:   ''
-#MaxEmptyLinesToKeep: 2
+MaxEmptyLinesToKeep: 1
 #NamespaceIndentation: None
 #ObjCBlockIndentWidth: 2
 #ObjCSpaceAfterProperty: false
@@ -88,10 +88,10 @@ BasedOnStyle: Google
 #PenaltyReturnTypeOnItsOwnLine: 200
 DerivePointerAlignment: false
 #PointerAlignment: Left
-#ReflowComments:  true
+ReflowComments:  true
 SortIncludes:    false
 #SpaceAfterCStyleCast: false
-#SpaceBeforeAssignmentOperators: true
+SpaceBeforeAssignmentOperators: true
 #SpaceBeforeParens: ControlStatements
 #SpaceInEmptyParentheses: false
 #SpacesBeforeTrailingComments: 2
@@ -100,8 +100,8 @@ SortIncludes:    false
 #SpacesInCStyleCastParentheses: false
 #SpacesInParentheses: false
 #SpacesInSquareBrackets: false
-#Standard:        Cpp11
+Standard:        Cpp11
 TabWidth:        4
-UseTab:          ForIndentation # other options are Never, Always
+UseTab:          Always # other options are Never, Always
 ## UseTab:        ForIndentationAndAlignment # Not applicable in 3.8
 #---
