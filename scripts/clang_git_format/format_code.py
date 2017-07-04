@@ -153,8 +153,8 @@ class ClangRepoFormatter(object):
             '-a',
             '--lang',
             type=str,
-            default=default_langs,
             nargs='+',
+            default=default_langs,
             help=("Languages used in the repository. This is used to determine"
                   "the files which clang format runs for. Default langs: %s."
                   .format(default_langs)))
@@ -190,6 +190,13 @@ class ClangRepoFormatter(object):
         # Mutually exclusive, internet-related arguments
         commands_group = parser.add_mutually_exclusive_group(required=True)
 
+        commands_group.add_argument(
+            "-d",
+            "--lint_files",
+            default=[],
+            nargs='+',
+            help=("Check if clang-format reports no diffs (clean state). "
+                  "Execute only on files given sequentially after this flag."))
         commands_group.add_argument(
             "-l",
             "--lint",
@@ -249,6 +256,9 @@ class ClangRepoFormatter(object):
             self.lint()
         elif parser_args["lint_all"]:
             self.lint_all()
+        elif parser_args["lint_files"]:
+            file_list = parser_args["lint_files"]
+            self._lint_files(file_list)
         elif len(parser_args["lint_patches"]):
             self.lint_patches()
         elif len(parser_args["reformat_branch"]):
@@ -328,7 +338,7 @@ class ClangRepoFormatter(object):
             logger.error("Code Style does not match coding style")
             sys.exit(1)
 
-    def lint_patch(self, infile):
+    def lint_patches(self, infile):
         """Lint patch command entry point
         """
         files = self.get_files_to_check_from_patch(infile)
