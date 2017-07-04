@@ -8,6 +8,10 @@
 # Functions
 ######################
 
+# This is run by travis automatically from the root of the project
+
+set -e   # Make sure any error makes the script to return an error code
+
 DIRS_IN="libs apps samples python"
 DIRS_OUT="otherlibs"
 LANGS=cpp
@@ -27,4 +31,5 @@ exit $?
 
 }
 
-lint
+case $TASK in
+  lint ) lint;;

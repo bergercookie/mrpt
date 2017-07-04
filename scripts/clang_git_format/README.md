@@ -55,6 +55,8 @@ A list of command-line options is the following. Run `--help` yourself for an
 up-to-date list of options:
 
 
+% TODO - update this
+
 ```
 
 $ ./format_code.py --help
