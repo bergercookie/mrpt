@@ -32,7 +32,8 @@ namespace mrpt
 		struct OBS_IMPEXP TMetricMapInitializer : public mrpt::utils::CLoadableOptions
 		{
 			friend class TSetOfMetricMapInitializers;
-			using Ptr = std::shared_ptr<TMetricMapInitializer>; //!< Smart pointer to TMetricMapInitializer
+			/** Smart pointer to TMetricMapInitializer */
+			using Ptr = std::shared_ptr<TMetricMapInitializer>;
 
 			/** Common params for all maps: These are automatically set in TMetricMapTypesRegistry::factoryMapObjectFromDefinition()  */
 			mrpt::maps::TMapGenericParams  genericMapParams;
@@ -50,11 +51,12 @@ namespace mrpt
 			const mrpt::utils::TRuntimeClassId::Ptr & getMetricMapClassType() const { return metricMapClassType; }
 
 			/** Looks up in the registry of known map types and call the corresponding `<metric_map_class>::MapDefinition()`. */
-			static TMetricMapInitializer* factory(const std::string &mapClassName);			
+			static TMetricMapInitializer* factory(const std::string &mapClassName);
 
 		protected:
 			TMetricMapInitializer(const mrpt::utils::TRuntimeClassId* classID );
-			const mrpt::utils::TRuntimeClassId::Ptr metricMapClassType; //!< Derived classes set this to CLASS_ID(< class >) where < class > is any CMetricMap derived class.
+			/** Derived classes set this to CLASS_ID(< class >) where < class > is any CMetricMap derived class. */
+			const mrpt::utils::TRuntimeClassId::Ptr metricMapClassType;
 
 			/** Load all map-specific params*/
 			virtual void  loadFromConfigFile_map_specific(const mrpt::utils::CConfigFileBase  &source, const std::string &sectionNamePrefix) = 0;

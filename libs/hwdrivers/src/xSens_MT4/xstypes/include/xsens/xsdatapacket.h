@@ -48,7 +48,7 @@ XSTYPES_DLL_API void XsDataPacket_destruct(XsDataPacket* thisPtr);
 XSTYPES_DLL_API void XsDataPacket_copy(XsDataPacket* copy, XsDataPacket const* src);
 XSTYPES_DLL_API void XsDataPacket_swap(XsDataPacket* a, XsDataPacket* b);
 XSTYPES_DLL_API int XsDataPacket_empty(const XsDataPacket* thisPtr);
-XSTYPES_DLL_API int XsDataPacket_itemOffsetExact(const XsDataPacket* thisPtr, XsDataIdentifier id); 
+XSTYPES_DLL_API int XsDataPacket_itemOffsetExact(const XsDataPacket* thisPtr, XsDataIdentifier id);
 XSTYPES_DLL_API int XsDataPacket_itemOffsetLoose(const XsDataPacket* thisPtr, XsDataIdentifier id);
 XSTYPES_DLL_API int XsDataPacket_itemOffsetMasked(const XsDataPacket* thisPtr, XsDataIdentifier id, XsDataIdentifier mask);
 XSTYPES_DLL_API void XsDataPacket_setMessage(XsDataPacket* thisPtr, const XsMessage* msg);
@@ -1128,15 +1128,24 @@ protected:
 	/*! \privatesection */
 #endif // __cplusplus
 
-	XsMessage			m_msg;						//!< The message that contains the data
-	XsMessage			m_legacyMsg;				//!< Optional legacy MtData message as received (for logging the received data only)
-	XsDeviceId			m_deviceId;					//!< The device Id to which the message belongs
-	XsDataIdentifier	m_lastFoundId;				//!< Last found data identifer, speeds up searches
-	int					m_lastFoundOffset;			//!< Offset of last found data identifier, speeds up searches
-	uint16_t			m_itemCount;				//!< The number of data items in the message
-	uint16_t			m_originalMessageLength;	//!< Length of the original message payload
-	XsTimeStamp			m_toa;						//!< Time of arrival (live packets only)
-	XsTimeStamp			m_packetId;					//!< 64 bit packet id, based on, depending on availability: (1) packet counter (2) sample time (3) arrival order
+	/** The message that contains the data */
+	XsMessage			m_msg;
+	/** Optional legacy MtData message as received (for logging the received data only) */
+	XsMessage			m_legacyMsg;
+	/** The device Id to which the message belongs */
+	XsDeviceId			m_deviceId;
+	/** Last found data identifer, speeds up searches */
+	XsDataIdentifier	m_lastFoundId;
+	/** Offset of last found data identifier, speeds up searches */
+	int					m_lastFoundOffset;
+	/** The number of data items in the message */
+	uint16_t			m_itemCount;
+	/** Length of the original message payload */
+	uint16_t			m_originalMessageLength;
+	/** Time of arrival (live packets only) */
+	XsTimeStamp			m_toa;
+	/** 64 bit packet id, based on, depending on availability: (1) packet counter (2) sample time (3) arrival order */
+	XsTimeStamp			m_packetId;
 };
 
 #endif // file guard

@@ -133,13 +133,13 @@ void  CObservationVelodyneScan::readFromStream(mrpt::utils::CStream &in, int ver
 
 			in >> minRange >> maxRange >> sensorPose;
 			{
-				uint32_t N; 
+				uint32_t N;
 				in >> N;
 				scan_packets.resize(N);
 				if (N) in.ReadBuffer(&scan_packets[0],sizeof(scan_packets[0])*N);
 			}
 			{
-				uint32_t N; 
+				uint32_t N;
 				in >> N;
 				calibration.laser_corrections.resize(N);
 				if (N) in.ReadBuffer(&calibration.laser_corrections[0],sizeof(calibration.laser_corrections[0])*N);
@@ -357,7 +357,7 @@ static void velodyne_scan_to_pointcloud(
 				const float horz_offset = calib.horizontalOffsetCorrection;
 				const float vert_offset = calib.verticalOffsetCorrection;
 
-				float xy_distance = distance * cos_vert_angle; 
+				float xy_distance = distance * cos_vert_angle;
 				if (vert_offset) xy_distance+= vert_offset * sin_vert_angle;
 
 				const int azimuth_corrected_for_lut = (azimuth_corrected + (CObservationVelodyneScan::ROTATION_MAX_UNITS/2))%CObservationVelodyneScan::ROTATION_MAX_UNITS;

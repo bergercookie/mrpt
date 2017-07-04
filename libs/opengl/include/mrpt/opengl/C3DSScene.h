@@ -74,7 +74,8 @@ namespace mrpt
 			{
 				TImpl3DS();
 				~TImpl3DS();
-				void	*file;	//!< Lib3dsFile*
+				/** Lib3dsFile* */
+				void	*file;
 			};
 
 			/** An internal pointer to the lib3ds library's object of type "Lib3dsFile"
@@ -83,13 +84,17 @@ namespace mrpt
 
 			/** Scale of the object */
 			//double	m_scale_x,m_scale_y,m_scale_z;
-			mrpt::math::TPoint3D   m_bbox_min, m_bbox_max; //!< Bounding box
+			/** Bounding box */
+			mrpt::math::TPoint3D   m_bbox_min, m_bbox_max;
 
 			bool	m_enable_extra_lighting;
 
-			//float	m_light_cons_attenuation;		//!< OpenGL Light attenuation factor (default=1.0)
-			//float	m_light_lin_attenuation;		//!< OpenGL Light attenuation factor (default=0.0)
-			//float	m_light_quad_attenuation;		//!< OpenGL Light attenuation factor (default=0.0)
+			/** OpenGL Light attenuation factor (default=1.0) */
+			//float	m_light_cons_attenuation;
+			/** OpenGL Light attenuation factor (default=0.0) */
+			//float	m_light_lin_attenuation;
+			/** OpenGL Light attenuation factor (default=0.0) */
+			//float	m_light_quad_attenuation;
 		};
 		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( C3DSScene, CRenderizableDisplayList, OPENGL_IMPEXP )
 

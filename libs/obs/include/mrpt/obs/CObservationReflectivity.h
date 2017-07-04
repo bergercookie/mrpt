@@ -28,8 +28,9 @@ namespace obs
 		DEFINE_SERIALIZABLE( CObservationReflectivity )
 
 	 public:
-		CObservationReflectivity( );	//!< Default constructor.
-		virtual ~CObservationReflectivity(); 
+		/** Default constructor. */
+		CObservationReflectivity( );
+		virtual ~CObservationReflectivity();
 
 		/** The read reflectivity level, in the range [0,1] (0=black, 1=white).
 		  */

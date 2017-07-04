@@ -48,9 +48,12 @@ XSTYPES_DLL_API int XsVector_equal(const XsVector* thisPtr, const XsVector* that
 #endif
 struct XsVector {
 XSCPPPROTECTED
-	XsReal* const m_data;		//!< \protected Points to contained data buffer
-	const XsSize m_size;		//!< \protected Size of contained data buffer in elements
-	const int m_flags;			//!< \protected Flags for data management
+	/** \protected Points to contained data buffer */
+	XsReal* const m_data;
+	/** \protected Size of contained data buffer in elements */
+	const XsSize m_size;
+	/** \protected Flags for data management */
+	const int m_flags;
 
 #ifdef __cplusplus
 	//! \brief Return the data management flags of the vector.
@@ -260,7 +263,7 @@ public:
 	//! \brief Returns the XsVector as a std::vector of XsReal
 	inline std::vector<XsReal> toVector() const
 	{
-		std::vector<XsReal> tmp(m_size);		
+		std::vector<XsReal> tmp(m_size);
 		if (m_size)
 			memcpy(&tmp[0], m_data, m_size * sizeof(XsReal));
 		return tmp;

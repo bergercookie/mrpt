@@ -37,7 +37,8 @@ namespace mrpt
 			std::vector<mrpt::math::TSegment3D> mSegments;
 			float   mLineWidth;
 			bool    m_antiAliasing;
-			float   m_verticesPointSize; //!< 0: means hidden
+			/** 0: means hidden */
+			float   m_verticesPointSize;
 		public:
 			/**
 			  * Clear the list of segments
@@ -153,7 +154,7 @@ namespace mrpt
 			  * Gets a specific line in the set, given its index.
 			  * \sa getLineByIndex
 			  */
-			void getLineByIndex(size_t index,double &x0,double &y0,double &z0,double &x1,double &y1,double &z1) const; 
+			void getLineByIndex(size_t index,double &x0,double &y0,double &z0,double &x1,double &y1,double &z1) const;
 
 			/** Class factory */
 			static CSetOfLines::Ptr Create(const std::vector<mrpt::math::TSegment3D> &sgms, const bool antiAliasing = true);
@@ -162,8 +163,10 @@ namespace mrpt
 			void  render_dl() const override;
 
 			//Iterator management
-			typedef std::vector<mrpt::math::TSegment3D>::iterator iterator;	//!< Iterator to the set.
-			typedef std::vector<mrpt::math::TSegment3D>::reverse_iterator reverse_iterator;	//!< Iterator to the set.
+			/** Iterator to the set. */
+			typedef std::vector<mrpt::math::TSegment3D>::iterator iterator;
+			/** Iterator to the set. */
+			typedef std::vector<mrpt::math::TSegment3D>::reverse_iterator reverse_iterator;
 
 			/**
 			  * Const iterator to the set.

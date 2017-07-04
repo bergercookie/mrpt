@@ -47,7 +47,8 @@ int compareChar(char const* a, char const* b)
 //! \brief Descriptor for XsInt64Array
 XsArrayDescriptor const g_xsStringDescriptor = {
 	//lint --e{64} ignore exact type mismatches here
-	sizeof(char),	// const size_t itemSize;	//!< \protected Size of a single data element
+	/** \protected Size of a single data element */
+	sizeof(char),	// const size_t itemSize;
 	XSEXPCASTITEMSWAP swapChar,		// void (*itemSwap)(void* a, void* b);
 	0,				// void (*itemConstruct)(void* e);
 	XSEXPCASTITEMCOPY copyChar,		// void (*itemCopyConstruct)(void* e, void const* s);

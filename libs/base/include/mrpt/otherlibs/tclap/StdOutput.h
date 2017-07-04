@@ -50,7 +50,8 @@ namespace TCLAP {
 class StdOutput : public CmdLineOutput
 {
 	protected:
-		std::ostream &m_my_output; //!< By JLBC for MRPT
+		/** By JLBC for MRPT */
+		std::ostream &m_my_output;
 
 	public:
 		/**
@@ -134,7 +135,7 @@ inline void StdOutput::version(CmdLineInterface& _cmd)
 
 inline void StdOutput::usage(CmdLineInterface& _cmd ) 
 {
-	m_my_output << std::endl << "USAGE: " << std::endl << std::endl; 
+	m_my_output << std::endl << "USAGE: " << std::endl << std::endl;
 
 	_shortUsage( _cmd, m_my_output );
 
@@ -142,7 +143,7 @@ inline void StdOutput::usage(CmdLineInterface& _cmd )
 
 	_longUsage( _cmd, m_my_output );
 
-	m_my_output << std::endl; 
+	m_my_output << std::endl;
 
 }
 
@@ -158,7 +159,7 @@ inline void StdOutput::failure( CmdLineInterface& _cmd,
 	{
 		std::cerr << "Brief USAGE: " << std::endl;
 
-		_shortUsage( _cmd, std::cerr );	
+		_shortUsage( _cmd, std::cerr );
 
 		std::cerr << std::endl << "For complete USAGE and HELP type: " 
 			      << std::endl << "   " << progName << " --help" 
@@ -183,7 +184,7 @@ inline void StdOutput::_shortUsage( CmdLineInterface& _cmd,
 	for ( int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++ )
 	{
 		s += " {";
-		for ( ArgVectorIterator it = xorList[i].begin(); 
+		for ( ArgVectorIterator it = xorList[i].begin();
 						it != xorList[i].end(); it++ )
 			s += (*it)->shortID() + "|";
 
@@ -214,8 +215,8 @@ inline void StdOutput::_longUsage( CmdLineInterface& _cmd,
 	// first the xor 
 	for ( int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++ )
 	{
-		for ( ArgVectorIterator it = xorList[i].begin(); 
-			  it != xorList[i].end(); 
+		for ( ArgVectorIterator it = xorList[i].begin();
+			  it != xorList[i].end();
 			  it++ )
 		{
 			spacePrint( os, (*it)->longID(), 75, 3, 3 );
@@ -231,8 +232,8 @@ inline void StdOutput::_longUsage( CmdLineInterface& _cmd,
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
 		if ( !xorHandler.contains( (*it) ) )
 		{
-			spacePrint( os, (*it)->longID(), 75, 3, 3 ); 
-			spacePrint( os, (*it)->getDescription(), 75, 5, 0 ); 
+			spacePrint( os, (*it)->longID(), 75, 3, 3 );
+			spacePrint( os, (*it)->getDescription(), 75, 5, 0 );
 			os << std::endl;
 		}
 

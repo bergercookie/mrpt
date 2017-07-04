@@ -25,7 +25,7 @@ namespace mrpt
 			
 			CCascadeClassifierDetection( );
 			
-			virtual ~CCascadeClassifierDetection(); 
+			virtual ~CCascadeClassifierDetection();
 
 			/** Initialize cascade classifier detection */
 			virtual void init(const mrpt::utils::CConfigFileBase &cfg );
@@ -38,16 +38,18 @@ namespace mrpt
 
 			virtual void detectObjects_Impl(const mrpt::obs::CObservation *obs, vector_detectable_object &detected);
 
-			void * m_cascade; //!< Cascade classifier object
+			/** Cascade classifier object */
+			void * m_cascade;
 
 			struct TOptions
 			{
-				std::string	cascadeFileName; 
-				double scaleFactor;	
+				std::string	cascadeFileName;
+				double scaleFactor;
 				int minNeighbors;
 				int flags;
 				int minSize;
-			}m_options; //!< Cascade classifier options
+			/** Cascade classifier options */
+			}m_options;
 
 		}; // End of class
 	}

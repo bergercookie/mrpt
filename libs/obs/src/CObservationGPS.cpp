@@ -310,9 +310,12 @@ bool TIMECONV_IsALeapYear( const unsigned short year )
 }
 
 bool TIMECONV_GetNumberOfDaysInMonth(
-	const unsigned short year,        //!< Universal Time Coordinated    [year]
-	const unsigned char month,        //!< Universal Time Coordinated    [1-12 months] 
-	unsigned char* days_in_month      //!< Days in the specified month   [1-28|29|30|31 days]
+	/** Universal Time Coordinated    [year] */
+	const unsigned short year,        
+	/** Universal Time Coordinated    [1-12 months]  */
+	const unsigned char month,        
+	/** Days in the specified month   [1-28|29|30|31 days] */
+	unsigned char* days_in_month      
 	)
 {
 	unsigned char utmp = 0;
@@ -321,7 +324,7 @@ bool TIMECONV_GetNumberOfDaysInMonth(
 	switch(month)
 	{
 	case  1: utmp = 31; break;
-	case  2: if( is_a_leapyear ){ utmp = 29; }else{ utmp = 28; }break;    
+	case  2: if( is_a_leapyear ){ utmp = 29; }else{ utmp = 28; }break;
 	case  3: utmp = 31; break;
 	case  4: utmp = 30; break;
 	case  5: utmp = 31; break;
@@ -332,7 +335,7 @@ bool TIMECONV_GetNumberOfDaysInMonth(
 	case 10: utmp = 31; break;
 	case 11: utmp = 30; break;
 	case 12: utmp = 31; break;
-	default: return false; break;    
+	default: return false; break;
 	}
 	*days_in_month = utmp;
 	return true;
@@ -343,12 +346,12 @@ bool TIMECONV_GetUTCTimeFromJulianDate(const double julian_date,  //!< Number of
 {
 	int a, b, c, d, e; // temporary values
 
-	unsigned short year;  
+	unsigned short year;
 	unsigned char month;
 	unsigned char day;
 	unsigned char hour;
-	unsigned char minute;        
-	unsigned char days_in_month = 0;  
+	unsigned char minute;
+	unsigned char days_in_month = 0;
 	double td; // temporary double
 	double seconds;
 	bool result;
@@ -364,7 +367,7 @@ bool TIMECONV_GetUTCTimeFromJulianDate(const double julian_date,  //!< Number of
 	e = (int)( ((double)(b-d))/30.6001 );
 
 	td      = b - d - (int)(30.6001*e) + fmod( julian_date+0.5, 1.0 );   // [days]
-	day     = (unsigned char)td;   
+	day     = (unsigned char)td;
 	td     -= day;
 	td     *= 24.0;        // [hours]
 	hour    = (unsigned char)td;
@@ -425,7 +428,7 @@ bool CObservationGPS::GPS_time_to_UTC(uint16_t gps_week,double gps_sec,const int
 
 bool CObservationGPS::GPS_time_to_UTC(uint16_t gps_week,double gps_sec,const int leap_seconds_count, mrpt::system::TTimeParts &utc_out)
 {
-	double julian_date = 0.0; 
+	double julian_date = 0.0;
 	if( gps_sec < 0.0  || gps_sec > 604800.0 )
 		return false;
 	if (!TIMECONV_GetJulianDateFromGPSTime(

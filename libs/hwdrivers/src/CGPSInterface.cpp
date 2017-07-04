@@ -103,7 +103,7 @@ void  CGPSInterface::loadConfig_sensorSpecific(
 	m_setup_cmds.clear();
 	for (int i=1; true; i++)
 	{
-		std::string sLine = configSource.read_string(iniSection, mrpt::format("setup_cmd%i",i),std::string() ); 
+		std::string sLine = configSource.read_string(iniSection, mrpt::format("setup_cmd%i",i),std::string() );
 		sLine = mrpt::system::trim( sLine );
 		if (sLine.empty()) 
 			break;
@@ -113,7 +113,7 @@ void  CGPSInterface::loadConfig_sensorSpecific(
 	m_shutdown_cmds.clear();
 	for (int i=1; true; i++)
 	{
-		std::string sLine = configSource.read_string(iniSection, mrpt::format("shutdown_cmd%i",i),std::string() ); 
+		std::string sLine = configSource.read_string(iniSection, mrpt::format("shutdown_cmd%i",i),std::string() );
 		sLine = mrpt::system::trim( sLine );
 		if (sLine.empty()) 
 			break;

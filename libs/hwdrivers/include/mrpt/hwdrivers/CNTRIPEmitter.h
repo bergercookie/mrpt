@@ -58,10 +58,13 @@ namespace mrpt
 		private:
 			CNTRIPClient::NTRIPArgs	m_ntrip_args;
 
-			CNTRIPClient	m_client;  //!< The NTRIP comms object.
-			CSerialPort		m_out_COM; //!< The output serial port.
+			/** The NTRIP comms object. */
+			CNTRIPClient	m_client;
+			/** The output serial port. */
+			CSerialPort		m_out_COM;
 
-			std::string     m_com_port;		//!< If set to non-empty, the serial port will be attempted to be opened automatically when this class is first used to request data from the laser.
+			/** If set to non-empty, the serial port will be attempted to be opened automatically when this class is first used to request data from the laser. */
+			std::string     m_com_port;
 			int             m_com_bauds;
 			bool            m_transmit_to_server;
 			std::string     m_raw_output_file_prefix;
@@ -100,7 +103,7 @@ namespace mrpt
 			/** The main loop, which must be called in a timely fashion in order to process the incomming NTRIP data stream and dump it to the serial port.
 			  *  This method is called automatically when used within rawlog-grabber.
 			  */
-			void doProcess(); 
+			void doProcess();
 
 			/** Exposes the NTRIP client object */
 			CNTRIPClient & getNTRIPClient() { return m_client; }

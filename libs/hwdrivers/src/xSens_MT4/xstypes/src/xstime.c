@@ -105,7 +105,8 @@ uint32_t XsTime_getTimeOfDay(struct tm* date_, time_t* secs_)
 
 		tNow = startTimeSysTime + (1000*(pc.QuadPart - startTimePerfCount))/perfCountFreq;
 
-		if (t > tNow || (tNow-t) > CORRECTION_DELTA_MS) //!< \todo find better solution
+		/** \todo find better solution */
+		if (t > tNow || (tNow-t) > CORRECTION_DELTA_MS) 
 		{
 			startTimePerfCount = pc.QuadPart;
 			startTimeSysTime = t;

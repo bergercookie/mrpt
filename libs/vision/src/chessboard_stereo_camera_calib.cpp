@@ -443,9 +443,12 @@ bool mrpt::vision::checkerBoardStereoCalibration(
 		// Draw projected points
 		for (size_t i=0;i<valid_image_pair_indices.size();i++)
 		{
-			//mrpt::poses::CPose3D			reconstructed_camera_pose;   //!< At output, the reconstructed pose of the camera.
-			//std::vector<TPixelCoordf>		projectedPoints_distorted;   //!< At output, only will have an empty vector if the checkerboard was not found in this image, or the predicted (reprojected) corners, which were used to estimate the average square error.
-			//std::vector<TPixelCoordf>		projectedPoints_undistorted; //!< At output, like projectedPoints_distorted but for the undistorted image.
+			/** At output, the reconstructed pose of the camera. */
+			//mrpt::poses::CPose3D			reconstructed_camera_pose;
+			/** At output, only will have an empty vector if the checkerboard was not found in this image, or the predicted (reprojected) corners, which were used to estimate the average square error. */
+			//std::vector<TPixelCoordf>		projectedPoints_distorted;
+			/** At output, like projectedPoints_distorted but for the undistorted image. */
+			//std::vector<TPixelCoordf>		projectedPoints_undistorted;
 			const size_t idx = valid_image_pair_indices[i];
 
 			TImageCalibData &dat_l = images[idx].left;

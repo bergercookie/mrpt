@@ -416,9 +416,12 @@ namespace nanoflann
 		SearchParams(int checks_IGNORED_ = 32, float eps_ = 0, bool sorted_ = true ) :
 			checks(checks_IGNORED_), eps(eps_), sorted(sorted_) {}
 
-		int   checks;  //!< Ignored parameter (Kept for compatibility with the FLANN interface).
-		float eps;  //!< search for eps-approximate neighbours (default: 0)
-		bool sorted; //!< only for radius search, require neighbours sorted by distance (default: true)
+		/** Ignored parameter (Kept for compatibility with the FLANN interface). */
+		int   checks;
+		/** search for eps-approximate neighbours (default: 0) */
+		float eps;
+		/** only for radius search, require neighbours sorted by distance (default: true) */
+		bool sorted;
 	};
 	/** @} */
 
@@ -758,13 +761,17 @@ namespace nanoflann
 		/**
 		 * The dataset used by this index
 		 */
-		const DatasetAdaptor &dataset; //!< The source of our data
+		/** The source of our data */
+		const DatasetAdaptor &dataset;
 
 		const KDTreeSingleIndexAdaptorParams index_params;
 
-		size_t m_size; //!< Number of current poins in the dataset
-		size_t m_size_at_index_build; //!< Number of points in the dataset when the index was built
-		int dim;  //!< Dimensionality of each data point
+		/** Number of current poins in the dataset */
+		size_t m_size;
+		/** Number of points in the dataset when the index was built */
+		size_t m_size_at_index_build;
+		/** Dimensionality of each data point */
+		int dim;
 
 
 		/*--------------------- Internal Data Structures --------------------------*/
@@ -774,15 +781,19 @@ namespace nanoflann
 			union {
 				struct leaf
                                 {
-					IndexType    left, right;  //!< Indices of points in leaf node
+					/** Indices of points in leaf node */
+					IndexType    left, right;
 				} lr;
 				struct nonleaf
                                 {
-					int          divfeat; //!< Dimension used for subdivision.
-					DistanceType divlow, divhigh; //!< The values used for subdivision.
+					/** Dimension used for subdivision. */
+					int          divfeat;
+					/** The values used for subdivision. */
+					DistanceType divlow, divhigh;
 				} sub;
 			} node_type;
-			Node* child1, * child2;  //!< Child nodes (both=NULL mean its a leaf node)
+			/** Child nodes (both=NULL mean its a leaf node) */
+			Node* child1, * child2;
 		};
 		typedef Node* NodePtr;
 

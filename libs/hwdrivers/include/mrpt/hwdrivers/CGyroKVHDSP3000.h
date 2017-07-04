@@ -21,7 +21,7 @@ namespace mrpt
 {
 	namespace hwdrivers
 	{
-		enum GYRO_MODE{RATE, INCREMENTAL_ANGLE, INTEGRATED_ANGLE};		
+		enum GYRO_MODE{RATE, INCREMENTAL_ANGLE, INTEGRATED_ANGLE};
 		/** A class for interfacing KVH DSP 3000 gyroscope with an assynchronous serial communication (product SN : 02-1222-01).
 		  *  It uses a serial port connection to the device. The class implements the generic sensor class.
 		  *  See also the application "rawlog-grabber" for a ready-to-use application to gather data from the scanner.
@@ -77,7 +77,8 @@ namespace mrpt
 			  */
 			bool 			searchPortAndConnect();
 
-            CSerialPort*			m_serialPort;			//!< The serial port connection
+            /** The serial port connection */
+            CSerialPort*			m_serialPort;
 			GYRO_MODE		m_mode;
 			bool 						m_firstInteration;
 				        

@@ -64,11 +64,13 @@ namespace mrpt
 			  */
 			bool 			searchPortAndConnect();
 
-			//CSerialPort		m_serial_port;			//!< The serial port connection
+			/** The serial port connection */
+			//CSerialPort		m_serial_port;
 
 			void * /*xsens::Cmt3 */		m_cmt3_ptr;
 			void * /*CmtDeviceId */		m_deviceId_ptr;
-			unsigned int				m_toutCounter;				//!< Timeout counter (for internal use only)
+			/** Timeout counter (for internal use only) */
+			unsigned int				m_toutCounter;
 
 			/** See the class documentation at the top for expected parameters */
 			void  loadConfig_sensorSpecific(

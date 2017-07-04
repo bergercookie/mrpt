@@ -30,7 +30,7 @@ namespace mrpt
 		{
 		private:
 			std::thread		m_videoThread;
-			bool	m_videothread_must_exit; 
+			bool	m_videothread_must_exit;
 			bool	m_videothread_initialized_done;
 			bool	m_videothread_initialized_error;
 			bool    m_videothread_finished;
@@ -162,7 +162,8 @@ namespace mrpt
 			  */
 			bool captureImageAsync( mrpt::utils::CImage&out_img, bool recttified);//string pict_name, 
 
-			bool isVideoStreamming() const; //!< Return true if video is streaming correctly \sa retrieve_video
+			/** Return true if video is streaming correctly \sa retrieve_video */
+			bool isVideoStreamming() const;
 
 
 //Rovio State
