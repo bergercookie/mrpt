@@ -114,8 +114,8 @@ int main(int argc, char **argv)
 			if (insertMyHeading)
 			{
 				of << "/* +------------------------------------------------------------------------+\n";
-				of << "   |                     Mobile Robot Programming Toolkit (MRPT)            |\n";
-				of << "   |                          http://www.mrpt.org/                          |\n";
+				of << "   |                Mobile Robot Programming Toolkit (MRPT)                 |\n";
+				of << "   |                         http://www.mrpt.org/                           |\n";
 				of << "   |                                                                        |\n";
 				of << "   | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |\n";
 				of << "   | See: http://www.mrpt.org/Authors - All rights reserved.                |\n";

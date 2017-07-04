@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -8,7 +8,7 @@
    +------------------------------------------------------------------------+ */
 
 #include <mrpt/vision/CDifodo.h>
-#include <mrpt/utils/types_math.h> // Eigen (with MRPT "plugin" in BaseMatrix<>)
+#include <mrpt/utils/types_math.h>  // Eigen (with MRPT "plugin" in BaseMatrix<>)
 #include <mrpt/utils/CConfigFileBase.h>
 #include <mrpt/utils/CImage.h>
 #include <mrpt/obs/CRawlog.h>
@@ -17,9 +17,9 @@
 #include <mrpt/gui.h>
 #include <iostream>
 
-class CDifodoDatasets : public mrpt::vision::CDifodo {
-public:
-
+class CDifodoDatasets : public mrpt::vision::CDifodo
+{
+   public:
 	/** Groundtruth camera pose */
 	mrpt::poses::CPose3D gt_pose;
 	/** Groundtruth camera previous pose */
@@ -27,10 +27,10 @@ public:
 
 	/** Opengl scene */
 	mrpt::opengl::COpenGLScene::Ptr scene;
-	mrpt::gui::CDisplayWindow3D	window;
-	mrpt::obs::CRawlog	dataset;
-	std::ifstream		f_gt;
-	std::ofstream		f_res;
+	mrpt::gui::CDisplayWindow3D window;
+	mrpt::obs::CRawlog dataset;
+	std::ifstream f_gt;
+	std::ofstream f_res;
 
 	unsigned int repr_level;
 	unsigned int rawlog_count;
@@ -47,7 +47,7 @@ public:
 	}
 
 	/** Initialize the visual odometry method and loads the rawlog file */
-	void loadConfiguration( const mrpt::utils::CConfigFileBase &ini );
+	void loadConfiguration(const mrpt::utils::CConfigFileBase& ini);
 
 	/** Load the depth image and the corresponding groundtruth pose */
 	void loadFrame();
@@ -61,20 +61,25 @@ public:
 	/** Update the opengl scene */
 	void updateScene();
 
-	/** A pre-step that should be performed before starting to estimate the camera speed
-	  * As a couple of frames are necessary to estimate the camera motion, this methods loads the first frame
+	/** A pre-step that should be performed before starting to estimate the
+	 * camera
+	 * speed
+	  * As a couple of frames are necessary to estimate the camera motion, this
+	 * methods loads the first frame
 	  * before any motion can be estimated.*/
 	void reset();
 
 	/** Save the pose estimation following the format of the TUM datasets:
-	  * 
+	  *
 	  * 'timestamp tx ty tz qx qy qz qw'
 	  *
-	  * Please visit http://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats for further details.*/  
+	  * Please visit
+	 * http://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats for
+	 * further
+	 * details.*/
 	void writeTrajectoryFile();
 
-private:
-
+   private:
 	// Used to interpolate grountruth poses
 	bool groundtruth_ok;
 	bool last_groundtruth_ok;

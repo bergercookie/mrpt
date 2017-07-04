@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -14,8 +14,8 @@
 
 class reactive_navigator_demoApp : public wxApp
 {
-    public:
-        virtual bool OnInit();
+   public:
+	virtual bool OnInit();
 };
 
-#endif // HOLONOMIC_NAVIGATOR_DEMOAPP_H
+#endif  // HOLONOMIC_NAVIGATOR_DEMOAPP_H

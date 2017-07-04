@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -13,19 +13,22 @@
 #include <xsens/xsdeviceid.h>
 
 #ifndef NOT_FOR_PUBLIC_RELEASE
-struct XsControl;	// required by DLL for supporting advanced features
+struct XsControl;  // required by DLL for supporting advanced features
 #endif
 
 struct XsDataFormat;
 
 //! Indicates that a data item is not available in the packet
-#define XS_DATA_ITEM_NOT_AVAILABLE		65535
+#define XS_DATA_ITEM_NOT_AVAILABLE 65535
 
 /*! \brief Contains offset information about data in the packet
-	\details All items are initialized to \a XS_DATA_ITEM_NOT_AVAILABLE and set to their proper
-	value by LegacyDataPacket::updateInfoList and/or the LegacyDataPacket update functions.
+	\details All items are initialized to \a XS_DATA_ITEM_NOT_AVAILABLE and set
+   to their proper
+	value by LegacyDataPacket::updateInfoList and/or the LegacyDataPacket update
+   functions.
 */
-struct PacketInfo {
+struct PacketInfo
+{
 	/** Offset of first data byte (whatever it is) */
 	uint16_t m_offset;
 	/** Offset of raw data */
@@ -36,9 +39,11 @@ struct PacketInfo {
 	uint16_t m_rawGyr;
 	/** Offset of raw magnetometer data */
 	uint16_t m_rawMag;
-	/** Offset of raw temperature data. Note that usually only the first item is used. */
+	/** Offset of raw temperature data. Note that usually only the first item is
+	 * used. */
 	uint16_t m_rawTemp[XS_MAX_TEMPERATURE_CHANNELS];
-	/** Offset of calibrated temperature data. Note that usually only the first item is used. */
+	/** Offset of calibrated temperature data. Note that usually only the first
+	 * item is used. */
 	uint16_t m_temp[XS_MAX_TEMPERATURE_CHANNELS];
 	/** Offset of calibrated data */
 	uint16_t m_calData;
@@ -144,7 +149,8 @@ struct PacketInfo {
 	uint16_t m_wRssi;
 	/** Total size of the data */
 	uint16_t m_size;
-	/** Boundary where the original data format is ignored and values are stored in double precision */
+	/** Boundary where the original data format is ignored and values are stored
+	 * in double precision */
 	uint16_t m_doubleBoundary;
 
 	/*! \brief Default contructor, sets all values to XS_DATA_ITEM_NOT_AVAILABLE
@@ -152,7 +158,8 @@ struct PacketInfo {
 	PacketInfo() { memset(this, 0xFF, sizeof(*this)); }
 };
 
-//! A structure containing fixed packet data, which should not change during a measurement for the same device
+//! A structure containing fixed packet data, which should not change during a
+//! measurement for the same device
 struct PacketFixedData
 {
 	PacketFixedData();
@@ -160,18 +167,20 @@ struct PacketFixedData
 	PacketFixedData(const PacketFixedData& pack);
 	~PacketFixedData();
 
-	void operator = (const PacketFixedData& data);
+	void operator=(const PacketFixedData& data);
 
-	/** Contains information about data in the packet and the format of that data */
-	PacketInfo*		m_infoList;
+	/** Contains information about data in the packet and the format of that
+	 * data
+	 */
+	PacketInfo* m_infoList;
 	/** A list of the formats of the data items */
-	XsDataFormat*	m_formatList;
+	XsDataFormat* m_formatList;
 	/** A list of the device-ids in this packet */
-	XsDeviceId*		m_idList;
+	XsDeviceId* m_idList;
 	/** Indicates that xbus-formatting is used */
-	bool			m_xm;
+	bool m_xm;
 	/** The number of data items in the message */
-	uint16_t		m_itemCount;
+	uint16_t m_itemCount;
 };
 
-#endif	// file guard
+#endif  // file guard

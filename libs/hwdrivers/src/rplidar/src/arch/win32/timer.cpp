@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -35,27 +35,27 @@
 #include <mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
 
-namespace rp{ namespace arch{
-
+namespace rp
+{
+namespace arch
+{
 static LARGE_INTEGER _current_freq;
 
 void HPtimer_reset()
 {
-    BOOL ans=QueryPerformanceFrequency(&_current_freq);
-    _current_freq.QuadPart/=1000;
+	BOOL ans = QueryPerformanceFrequency(&_current_freq);
+	_current_freq.QuadPart /= 1000;
 }
 
 _u32 getHDTimer()
 {
-    LARGE_INTEGER current;
-    QueryPerformanceCounter(&current);
+	LARGE_INTEGER current;
+	QueryPerformanceCounter(&current);
 
-    return (_u32)(current.QuadPart/_current_freq.QuadPart);
+	return (_u32)(current.QuadPart / _current_freq.QuadPart);
 }
 
-BEGIN_STATIC_CODE(timer_cailb)
-{
-    HPtimer_reset();
-}END_STATIC_CODE(timer_cailb)
-
-}}
+BEGIN_STATIC_CODE(timer_cailb) { HPtimer_reset(); }
+END_STATIC_CODE(timer_cailb)
+}
+}

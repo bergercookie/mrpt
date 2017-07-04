@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -14,7 +14,6 @@
 
 #include <mrpt/vision/utils.h>
 #include <mrpt/vision/TSimpleFeature.h>
-#include <mrpt/utils/types_math.h> // Eigen must be included first via MRPT to enable the plugin system
+#include <mrpt/utils/types_math.h>  // Eigen must be included first via MRPT to enable the plugin system
 
 #endif
-

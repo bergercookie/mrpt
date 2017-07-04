@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -22,15 +22,15 @@ class slamdemoFrame;
 class slamdemoApp : public wxApp
 {
 	bool doCommandLineProcess();
-	void DoBatchExperiments(const std::string &cfgFil);
+	void DoBatchExperiments(const std::string& cfgFil);
 
 	slamdemoFrame* win;
 
-    public:
-        virtual bool OnInit();
+   public:
+	virtual bool OnInit();
 
-	private:
-		bool  m_option_norun;
+   private:
+	bool m_option_norun;
 };
 
-#endif // SLAMDEMOAPP_H
+#endif  // SLAMDEMOAPP_H

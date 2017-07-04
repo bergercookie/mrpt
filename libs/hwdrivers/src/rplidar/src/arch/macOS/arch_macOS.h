@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -47,7 +47,6 @@
 #include <iostream>
 #include <string>
 
-
 // POSIX specific
 extern "C" {
 #include <unistd.h>
@@ -62,4 +61,3 @@ extern "C" {
 }
 
 #include "arch/macOS/timer.h"
-

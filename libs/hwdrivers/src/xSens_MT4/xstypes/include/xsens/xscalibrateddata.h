@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -17,14 +17,20 @@ struct XsCalibratedData;
 #ifdef __cplusplus
 extern "C" {
 #else
-#define XSCALIBRATEDDATA_INITIALIZER {XSVECTOR3_INITIALIZER, XSVECTOR3_INITIALIZER, XSVECTOR3_INITIALIZER}
+#define XSCALIBRATEDDATA_INITIALIZER                                        \
+	{                                                                       \
+		XSVECTOR3_INITIALIZER, XSVECTOR3_INITIALIZER, XSVECTOR3_INITIALIZER \
+	}
 #endif
 
-XSTYPES_DLL_API void XsCalibratedData_construct(struct XsCalibratedData* thisPtr, const XsReal* acc, const XsReal* gyr, const XsReal* mag);
-XSTYPES_DLL_API void XsCalibratedData_destruct(struct XsCalibratedData* thisPtr);
+XSTYPES_DLL_API void XsCalibratedData_construct(
+	struct XsCalibratedData* thisPtr, const XsReal* acc, const XsReal* gyr,
+	const XsReal* mag);
+XSTYPES_DLL_API void XsCalibratedData_destruct(
+	struct XsCalibratedData* thisPtr);
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
 struct XsCalibratedData
@@ -38,23 +44,17 @@ struct XsCalibratedData
 
 #ifdef __cplusplus
 	//! \brief Constructor \sa XsCalibratedData_construct
-	inline XsCalibratedData()
-	{}
-
+	inline XsCalibratedData() {}
 	//! \brief Copy constructor, copies the values from \a other to this
 	inline XsCalibratedData(const XsCalibratedData& other)
-		: m_acc(other.m_acc)
-		, m_gyr(other.m_gyr)
-		, m_mag(other.m_mag)
+		: m_acc(other.m_acc), m_gyr(other.m_gyr), m_mag(other.m_mag)
 	{
 	}
 
 	//! \brief Destructor
-	inline ~XsCalibratedData()
-	{}
-
+	inline ~XsCalibratedData() {}
 	//! \brief Assignment operator, copies the values from \a other to this
-	inline const XsCalibratedData& operator = (const XsCalibratedData& other)
+	inline const XsCalibratedData& operator=(const XsCalibratedData& other)
 	{
 		if (this != &other)
 		{
@@ -68,4 +68,4 @@ struct XsCalibratedData
 };
 typedef struct XsCalibratedData XsCalibratedData;
 
-#endif // file guard
+#endif  // file guard

@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -15,7 +15,7 @@
 // Standard headers:
 #include <cstddef>
 #include <cstdlib>
-#define _USE_MATH_DEFINES // (For VS to define M_PI, etc. in cmath)
+#define _USE_MATH_DEFINES  // (For VS to define M_PI, etc. in cmath)
 #include <cmath>
 // C++ STL Library:
 #include <vector>
@@ -32,4 +32,3 @@
 #include <mrpt/utils/types_simple.h>
 //
 #endif
-

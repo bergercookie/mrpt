@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -17,38 +17,48 @@ typedef struct XsVersion XsVersion;
 #ifdef __cplusplus
 extern "C" {
 #else
-#define XSVERSION_INITIALIZER { 0, 0, 0, 0, XsString_INITIALIZER }
+#define XSVERSION_INITIALIZER            \
+	{                                    \
+		0, 0, 0, 0, XsString_INITIALIZER \
+	}
 #endif
 
 XSTYPES_DLL_API int XsVersion_empty(const XsVersion* thisPtr);
-XSTYPES_DLL_API void XsVersion_toString(const XsVersion* thisPtr, XsString* version);
+XSTYPES_DLL_API void XsVersion_toString(
+	const XsVersion* thisPtr, XsString* version);
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
-struct XsVersion {
+struct XsVersion
+{
 #ifdef __cplusplus
-	//! \brief Constructs a version object using the supplied parameters or an empty version object if no parameters are given.
-	explicit XsVersion(int maj = 0, int min = 0, int rev = 0, int bld = 0, const XsString& extra = XsString())
-		: m_major(maj)
-		, m_minor(min)
-		, m_revision(rev)
-		, m_build(bld)
-		, m_extra(extra)
-	{}
+	//! \brief Constructs a version object using the supplied parameters or an
+	//! empty version object if no parameters are given.
+	explicit XsVersion(
+		int maj = 0, int min = 0, int rev = 0, int bld = 0,
+		const XsString& extra = XsString())
+		: m_major(maj),
+		  m_minor(min),
+		  m_revision(rev),
+		  m_build(bld),
+		  m_extra(extra)
+	{
+	}
 
 	//! \brief Constructs a version object based upon the \a other object
 	XsVersion(const XsVersion& other)
-		: m_major(other.m_major)
-		, m_minor(other.m_minor)
-		, m_revision(other.m_revision)
-		, m_build(other.m_build)
-		, m_extra(other.m_extra)
-	{}
+		: m_major(other.m_major),
+		  m_minor(other.m_minor),
+		  m_revision(other.m_revision),
+		  m_build(other.m_build),
+		  m_extra(other.m_extra)
+	{
+	}
 
 	//! \brief Assign the version from the \a other object
-	XsVersion& operator = (const XsVersion& other)
+	XsVersion& operator=(const XsVersion& other)
 	{
 		m_major = other.m_major;
 		m_minor = other.m_minor;
@@ -59,11 +69,7 @@ struct XsVersion {
 	}
 
 	//! \brief \copybrief XsVersion_empty
-	inline bool empty() const
-	{
-		return 0 != XsVersion_empty(this);
-	}
-	
+	inline bool empty() const { return 0 != XsVersion_empty(this); }
 	//! \brief \copybrief XsVersion_toString
 	inline XsString toString() const
 	{
@@ -80,10 +86,11 @@ struct XsVersion {
 	inline int revision() const { return m_revision; }
 	//! \brief Return the \e build \e number part of the version
 	inline int build() const { return m_build; }
-	//! \brief Return the extra part of the version. This may contain custom version details such as 'beta' or 'Mk4' to indicate the readiness and purpose of this version of the object.
+	//! \brief Return the extra part of the version. This may contain custom
+	//! version details such as 'beta' or 'Mk4' to indicate the readiness and
+	//! purpose of this version of the object.
 	inline XsString extra() const { return m_extra; }
-
-private:
+   private:
 #endif
 
 	/** The major part of the version number  */
@@ -98,4 +105,4 @@ private:
 	XsString m_extra;
 };
 
-#endif // file guard
+#endif  // file guard

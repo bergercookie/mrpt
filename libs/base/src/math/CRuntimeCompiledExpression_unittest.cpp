@@ -1,6 +1,6 @@
 /* +------------------------------------------------------------------------+
-   |                     Mobile Robot Programming Toolkit (MRPT)            |
-   |                          http://www.mrpt.org/                          |
+   |                Mobile Robot Programming Toolkit (MRPT)                 |
+   |                         http://www.mrpt.org/                           |
    |                                                                        |
    | Copyright (c) 2005-2017, Individual contributors, see AUTHORS file     |
    | See: http://www.mrpt.org/Authors - All rights reserved.                |
@@ -18,7 +18,7 @@ using namespace mrpt::utils;
 using namespace mrpt::math;
 using namespace std;
 
-TEST(RuntimeCompiledExpression,SimpleTest)
+TEST(RuntimeCompiledExpression, SimpleTest)
 {
 	mrpt::math::CRuntimeCompiledExpression expr;
 	std::map<std::string, double> vars;
@@ -27,7 +27,6 @@ TEST(RuntimeCompiledExpression,SimpleTest)
 	vars["y"] = 3.0;
 	expr.compile("x^2+x*y+1", vars);
 
-	EXPECT_NEAR(expr.eval(), vars["x"] * vars["x"] + vars["x"] * vars["y"] + 1.0, 1e-9);
+	EXPECT_NEAR(
+		expr.eval(), vars["x"] * vars["x"] + vars["x"] * vars["y"] + 1.0, 1e-9);
 }
-
-
