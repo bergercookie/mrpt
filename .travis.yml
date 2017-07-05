@@ -35,11 +35,6 @@ addons:
     - libpython-dev python-numpy
     - qtbase5-dev
 
-language: python
-python:
-  - "2.7"
-  - "3.3"
-
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
 
@@ -50,17 +45,14 @@ install:
     /usr/bin/yes | pip uninstall numpy ;
     brew install opencv ;
     brew install assimp ;
-
-    brew install pip;
     fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$CXX" = "g++" ]; then export CXX="g++-6"; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$CXX" == "clang++" ]; then export CXX="clang++-3.8"; fi
-
   - pip install -r travis/python_reqs.txt
 
 script:
   - bash travis/check_style.sh
-  - bash .travis.sh
+  - bash travis/travis_main.sh
 
 env:
   global:
@@ -87,5 +79,7 @@ matrix:
   - compiler: clang
     os: osx
     env: TASK="test"
-  - os: linux
+  - language: python
+    os: linux
     env: TASK="lint"
+

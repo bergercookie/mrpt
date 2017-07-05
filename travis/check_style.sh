@@ -19,8 +19,19 @@ FORMAT_CODE_BIN="scripts/clang_git_format/format_code.py"
 
 function lint() {
 
-#CHANGED_FILES=($(git diff --name-only $TRAVIS_COMMIT_RANGE))
-#printf "Changed files; ${CHANGED_FILES}\n"
+printf "check_style.sh: PWD=$PWD\n"
+printf "check_style.sh: toplevel=$(git rev-parse --show-toplevel)\n"
+printf "git log:\n$(git log --name-only --shortstat -n 5)\n"
+
+# Get list of changed files for lint to run on
+CHANGED_FILES=
+if [[ $TRAVIS_PULL_REQUEST ]]; then # PR
+  printf "commit range: $TRAVIS_COMMIT_RANGE\n"
+  CHANGED_FILES=($(git diff --name-only $TRAVIS_COMMIT_RANGE))
+else # Single Commit
+  CHANGED_FILES=($(git diff --name-only $TRAVIS_COMMIT))
+fi
+printf "Changed files: ${CHANGED_FILES}\n"
 
 ${FORMAT_CODE_BIN} -g . --lang ${LANGS} \
   -o ${DIRS_OUT} -i ${DIRS_IN} \
@@ -33,3 +44,4 @@ exit $?
 
 case $TASK in
   lint ) lint;;
+esac
