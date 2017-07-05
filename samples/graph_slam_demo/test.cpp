@@ -51,7 +51,7 @@ struct EdgeAdders;
 template <class GRAPH>
 struct    EdgeAdders<GRAPH, false>
 {
-	static const int DIM = GRAPH::edge_t::type_value::static_size;
+	static   const int DIM = GRAPH::edge_t::type_value::static_size;
 	typedef CMatrixFixedNumeric<double, DIM, DIM> cov_t;
 
 	static void addEdge(

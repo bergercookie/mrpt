@@ -27,6 +27,7 @@ printf "check_style.sh: toplevel=$(git rev-parse --show-toplevel)\n"
 
 # Following command fails if you "git commit --amend" - Works correctly on
 # standard commits
+echo "commit_range: $TRAVIS_COMMIT_RANGE"
 changed_files=$(git diff --name-only $TRAVIS_COMMIT_RANGE)
 printf "Summary of changed files:\n\n${changed_files}\n\n"
 
