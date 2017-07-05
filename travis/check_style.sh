@@ -23,6 +23,10 @@ printf "check_style.sh: PWD=$PWD\n"
 printf "check_style.sh: toplevel=$(git rev-parse --show-toplevel)\n"
 printf "git log:\n$(git log --name-only --shortstat -n 5)\n"
 
+print "remote: $(git remote -v)"
+git remote set-branches origin mrpt-2.0-devel && git fetch
+print ": $(git remote -v)"
+
 # Get list of changed files for lint to run on
 CHANGED_FILES=
 if [[ $TRAVIS_PULL_REQUEST ]]; then # PR
