@@ -21,10 +21,10 @@ function lint() {
 
 printf "check_style.sh: PWD=$PWD\n"
 printf "check_style.sh: toplevel=$(git rev-parse --show-toplevel)\n"
-printf "git log:\n$(git log --name-only --shortstat -n 5)\n"
 
 # Get list of changed files for lint to run on
-printf "commit range: $TRAVIS_COMMIT_RANGE\n"
+# Following command fails if you "git commit --amend" - Works correctly on
+# standard commits
 CHANGED_FILES=($(git diff --name-only $TRAVIS_COMMIT_RANGE))
 printf "Changed files: ${CHANGED_FILES}\n"
 
