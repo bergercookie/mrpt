@@ -23,6 +23,12 @@ void MyCoolFunction(const TParametersDouble& params)
 	cout << endl;
 }
 
+void another_fun()
+{
+	a = 1;
+	b = 2;
+}
+
 // ------------------------------------------------------
 //				TestParameters
 // ------------------------------------------------------
